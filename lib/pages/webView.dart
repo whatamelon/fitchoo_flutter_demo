@@ -18,36 +18,31 @@ class _webViewPageState extends State<webViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-          children: [
+        body: Flex(
+          direction: Axis.vertical,
+          children: <Widget>[
             Expanded(
                 child: WebView(
-                    key: _key,
-                    initialUrl: 'https://devfront.fitchoo.kr/home/',
-                    javascriptChannels: Set.from([
-                      JavascriptChannel(
-                          name: 'setHeight',
-                          onMessageReceived: (JavascriptMessage result) {
-                            print(result.message);
-                            UserState $user = Provider.of<UserState>(context, listen: false);
-                            $user.setUserHeight(result.message);
-                          })
-                    ]),
-                    onWebViewCreated: (WebViewController controller) {
-                      _controller = controller;
-                      _onShowUserAgent(controller, context);
-                    },
-                    javascriptMode: JavascriptMode.unrestricted,
+                  key: _key,
+                  initialUrl: 'https://devfront.fitchoo.kr/home/',
+                  javascriptChannels: Set.from([
+                    JavascriptChannel(
+                        name: 'setHeight',
+                        onMessageReceived: (JavascriptMessage result) {
+                          print(result.message);
+                          UserState $user = Provider.of<UserState>(context, listen: false);
+                          $user.setUserHeight(result.message);
+                        })
+                  ]),
+                  onWebViewCreated: (WebViewController controller) {
+                    UserState $user = Provider.of<UserState>(context, listen: false);
+                    _controller.evaluateJavascript('callbackAuthToken(${$user.accessToken})');
+                  },
+                  javascriptMode: JavascriptMode.unrestricted,
                 )
-            )
+            ),
           ],
-        ));
-  }
-
-  void _onShowUserAgent(
-      WebViewController controller, BuildContext context) async {
-    UserState $user = Provider.of<UserState>(context, listen: false);
-    controller.evaluateJavascript(
-        'callbackAuthToken.postMessage(${$user.accessToken})');
+        )
+    );
   }
 }
