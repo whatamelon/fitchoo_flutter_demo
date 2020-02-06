@@ -121,19 +121,14 @@ class _MyPageState extends State<MyPage> {
                               print('${lists[index]['code']}');
                               if (lists[index]['code'] == '10') {
                                 if($user.snsType == 'kakao') {
-                                  _kakaoLogout().then((_) {
-                                    Navigator.pushReplacement(context,
-                                        MaterialPageRoute(builder: (context) => InitPage()));
-                                  });
+                                  _kakaoLogout();
                                 } else if($user.snsType == 'naver') {
-                                  _naverLogout().then((_) {
-                                    Navigator.pushReplacement(context,
-                                        MaterialPageRoute(
-                                            builder: (context) => InitPage()));
-                                  });
+                                  _naverLogout();
                                 } else {
-
+                                  $user.userLogOut();
                                 }
+                                Navigator.pushReplacement(context,
+                                    MaterialPageRoute(builder: (context) => InitPage()));
                                 $user.logout();
                               }
                             }

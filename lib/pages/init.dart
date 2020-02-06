@@ -1,10 +1,13 @@
-import 'package:fitchoo/pages/depth//login.dart';
+import 'package:fitchoo/pages/initial/login.dart';
 import 'package:fitchoo/pages/tab.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:flutter_kakao_login/flutter_kakao_login.dart';
 import 'package:provider/provider.dart';
 import 'package:fitchoo/states/user_state.dart';
+import 'package:device_info/device_info.dart';
+import 'dart:io';
 
 class InitPage extends StatefulWidget {
 
@@ -13,14 +16,22 @@ class InitPage extends StatefulWidget {
 }
 
 class _InitPageState extends State<InitPage> {
+  List _deviceInfo = <dynamic>[];
+  static final DeviceInfoPlugin plugin = DeviceInfoPlugin();
+
+  @override
+  void initState() {
+    super.initState();
+    initPlatform(_deviceInfo);
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery
         .of(context)
         .size;
     return Scaffold(
-      body: _rootBody(size, context),
-
+      body: _rootBody(size, context)
     );
   }
 
@@ -111,16 +122,43 @@ class _InitPageState extends State<InitPage> {
           splashColor: Colors.greenAccent,
           onPressed: () {
             _naverLogin().then((result) {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => TabPage()));
-              UserState $user = Provider.of<UserState>(context, listen: false);
-              $user.setUserSNSType('naver');
-              $user.setUserAppType('android');
-              $user.setUserDeviceInfo('[164], samsung, SM-G925S, android ver:7.0, sdk:24');
-              $user.setUserSNSId(result.account.id);
-              $user.setUserEmail(result.account.email);
-              $user.setUserPassword('11111111');
-              $user.login();
+              if(result.account.email == '' || result.account.email ==null) {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) =>
+                    new CupertinoAlertDialog(
+                      content: new Text("이미 가입된 계정입니다.",style: TextStyle(fontSize:16)),
+                      actions: <Widget>[
+                        CupertinoDialogAction(
+                          onPressed: () {
+                            Navigator.pop(context, 'Cheesecake');
+                          },
+                          isDefaultAction: true,
+                          child: Text("닫기",style: TextStyle(fontSize:12),),
+                        )
+                      ],
+                    )
+                );
+              }else {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => TabPage()));
+                UserState $user = Provider.of<UserState>(context, listen: false);
+                $user.setUserSNSType('naver');
+                if(Platform.isAndroid ){
+                  $user.setUserAppType('android');
+                }else if(Platform.isIOS) {
+                  $user.setUserAppType('ios');
+                }
+                $user.setUserSNSId(result.account.id);
+                $user.setUserEmail(result.account.email);
+                $user.setUserPassword('');
+                $user.userLogIn();
+                if($user.accessToken == null || $user.accessToken == '') {
+                }
+                else{
+                  $user.login();
+                }
+              }
             });
           },
         )
@@ -147,16 +185,43 @@ class _InitPageState extends State<InitPage> {
           splashColor: Colors.yellowAccent,
           onPressed: () {
             _kakaoLogin().then((result) {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => TabPage()));
-              UserState $user = Provider.of<UserState>(context, listen: false);
-              $user.setUserSNSType('naver');
-              $user.setUserAppType('android');
-              $user.setUserDeviceInfo('[164], samsung, SM-G925S, android ver:7.0, sdk:24');
-              $user.setUserSNSId(result.account.userID);
-              $user.setUserEmail(result.account.userEmail);
-              $user.setUserPassword('11111111');
-              $user.login();
+              if(result.account.userEmail == '' || result.account.userEmail ==null) {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) =>
+                    new CupertinoAlertDialog(
+                      content: new Text("이미 가입된 계정입니다.",style: TextStyle(fontSize:16)),
+                      actions: <Widget>[
+                        CupertinoDialogAction(
+                          onPressed: () {
+                            Navigator.pop(context, 'Cheesecake');
+                          },
+                          isDefaultAction: true,
+                          child: Text("닫기",style: TextStyle(fontSize:12),),
+                        )
+                      ],
+                    )
+                );
+              }else {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => TabPage()));
+                UserState $user = Provider.of<UserState>(context, listen: false);
+                $user.setUserSNSType('kakao');
+                if(Platform.isAndroid ){
+                  $user.setUserAppType('android');
+                }else if(Platform.isIOS) {
+                  $user.setUserAppType('ios');
+                }
+                $user.setUserSNSId(result.account.userID);
+                $user.setUserEmail(result.account.userEmail);
+                $user.setUserPassword('');
+                $user.userLogIn();
+                if($user.accessToken == null || $user.accessToken == '') {
+                }
+                else{
+                  $user.login();
+                }
+              }
             });
           },
         )
@@ -188,4 +253,40 @@ class _InitPageState extends State<InitPage> {
    print('네이버 이르으으으음------${naverEmail}');
    return result;
  }
+
+  Future<void> initPlatform(_deviceInfo) async {
+    if (Platform.isAndroid) {
+      setState(() async {
+        _deviceInfo = getAndroidDevice(await plugin.androidInfo);
+        UserState $user = Provider.of<UserState>(context, listen: false);
+        $user.setUserDeviceInfo(_deviceInfo);
+      });
+    }
+    if (Platform.isIOS) {
+      setState(() async {
+        _deviceInfo = getIosDevice(await plugin.iosInfo);
+      });
+    }
+  }
+}
+
+getIosDevice(IosDeviceInfo device) {
+  return [
+    device.name,
+    device.systemName,
+    device.systemVersion,
+    device.model,
+    device.localizedModel,
+    device.identifierForVendor,
+  ];
+}
+
+getAndroidDevice(AndroidDeviceInfo device) {
+  return [
+    '[164]',
+    device.brand,
+    device.model,
+    'android ver: ${device.version.release}',
+    'sdk: ${device.version.sdkInt}'
+  ];
 }

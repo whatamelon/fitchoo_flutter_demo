@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'dart:convert';
+
+const baseUrl = 'https://rest.fitchoo.kr';
+
 
 class UserState with ChangeNotifier {
 //  -----------------------------------
 //  State
 
   bool _loogedIn = false;
+  bool _signUpMes = false;
+  String _accessToken = '';
+  String _userId = '';
   String _userHeight = '';
   String _userEmail = '';
   String _userPassword = '';
@@ -16,10 +24,13 @@ class UserState with ChangeNotifier {
   String _options = '';
 
 //  -----------------------------------
-//  Getter
+//  set
 
   UserState() {
     this._loogedIn = false;
+    this._signUpMes = false;
+    this._accessToken = '';
+    this._userId = '';
     this._userHeight = '';
     this._userEmail = '';
     this._userPassword = '';
@@ -32,10 +43,22 @@ class UserState with ChangeNotifier {
   }
 
 //  -----------------------------------
-//  Mutation
+//  get
 
   bool get loggedIn {
     return _loogedIn;
+  }
+
+  bool get signUpMes {
+    return _signUpMes;
+  }
+
+  String get accessToken {
+    return _accessToken;
+  }
+
+  String get userId {
+    return _userId;
   }
 
   String get userHeight {
@@ -77,6 +100,76 @@ class UserState with ChangeNotifier {
 //  -----------------------------------
 //  Action
 
+  var dio = Dio();
+
+  signUp() async {
+    Response response;
+    try{
+      response = await dio.post("$baseUrl/users/signup",
+          data: {
+            "snsType": _snsType,
+            "email": _userEmail,
+            "passwd": _userPassword,
+            "snsId": _snsId,
+            "appType": _appType,
+            "pushKey": _pushKey,
+            "deviceInfo": _deviceInfo,
+            "options": _options,
+          });
+      if(response.statusCode == 200) {
+        print(response.data['result']);
+        this._userId = jsonDecode(response.data['result']['userId']);
+        this._signUpMes = true;
+      }else {
+        this._signUpMes = false;
+      }
+    }catch(e) {
+      print(e);
+    }
+    notifyListeners();
+  }
+
+  userLogIn() async {
+    Dio dio = new Dio();
+    Response response;
+    print('accessToken1------'+_accessToken);
+    try{
+      response = await dio.post("$baseUrl/users/signin",
+          data: {
+            "snsType": _snsType,
+            "email": _userEmail,
+            "passwd": _userPassword,
+            "snsId": _snsId,
+            "appType": _appType,
+            "pushKey": _pushKey,
+            "deviceInfo": _deviceInfo,
+            "options": _options,
+          });
+      print('first+${response.data}');
+      if(response.data['status'] == 200) {
+        print('ㅇㅋ데이터받아옴--------${response.data['result']}');
+        print('ㅇㅋ데이터받아옴2--------${response.data['result']['authToken']}');
+//        this._accessToken = response.data['result']['authToken'];
+        this.setAccessToken(response.data['result']['authToken']);
+
+        print('accessToken2-------$_accessToken');
+        this._signUpMes = true;
+      }else {
+        print('로그인 에러-------${response.data}');
+        this._signUpMes = false;
+      }
+    }catch(e) {
+      print('login error--------$e');
+    }
+    notifyListeners();
+  }
+
+  userLogOut() async {
+    Dio dio = new Dio();
+    await dio.delete("$baseUrl/users");
+    notifyListeners();
+  }
+
   login() {
     this._loogedIn = true;
     notifyListeners();
@@ -87,7 +180,19 @@ class UserState with ChangeNotifier {
     notifyListeners();
   }
 
-  setUserHeight(i) {
+  setAccessToken(i) {
+    this._accessToken = i;
+    notifyListeners();
+  }
+
+  setUserHeight(i) async {
+    Dio dio = new Dio();
+    print('accessTokenForHeight------'+_accessToken);
+    await dio.put("$baseUrl/users/height/$i",
+        options: Options(
+          headers: {
+            "Authorization" : _accessToken,
+          }));
     this._userHeight = i;
     notifyListeners();
   }
