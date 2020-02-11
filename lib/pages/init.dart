@@ -7,7 +7,11 @@ import 'package:flutter_kakao_login/flutter_kakao_login.dart';
 import 'package:provider/provider.dart';
 import 'package:fitchoo/states/user_state.dart';
 import 'package:device_info/device_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+//import 'package:firebase_messaging/firebase_messaging.dart';
+
+//final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 class InitPage extends StatefulWidget {
 
@@ -17,13 +21,30 @@ class InitPage extends StatefulWidget {
 
 class _InitPageState extends State<InitPage> {
   List _deviceInfo = <dynamic>[];
+//  String autoLoginId = '';
   static final DeviceInfoPlugin plugin = DeviceInfoPlugin();
 
   @override
   void initState() {
     super.initState();
     initPlatform(_deviceInfo);
+//    autoLogIn();
+//    firebaseCloudMessaging_Listeners();
   }
+
+//  void autoLogIn() async {
+//    final SharedPreferences prefs = await SharedPreferences.getInstance();
+//    final String userId = prefs.getString('username');
+//
+//    UserState $user = Provider.of<UserState>(context, listen: false);
+//    if (userId != null) {
+//      setState(() {
+//        $user.login();
+//        autoLoginId = userId;
+//      });
+//      return;
+//    }
+//  }
 
   @override
   Widget build(BuildContext context) {
@@ -268,6 +289,26 @@ class _InitPageState extends State<InitPage> {
       });
     }
   }
+
+
+//  void firebaseCloudMessaging_Listeners() {
+//
+//    _firebaseMessaging.getToken().then((token){
+//      print('token:'+token);
+//    });
+//
+//    _firebaseMessaging.configure(
+//      onMessage: (Map<String, dynamic> message) async {
+//        print('on message $message');
+//      },
+//      onResume: (Map<String, dynamic> message) async {
+//        print('on resume $message');
+//      },
+//      onLaunch: (Map<String, dynamic> message) async {
+//        print('on launch $message');
+//      },
+//    );
+//  }
 }
 
 getIosDevice(IosDeviceInfo device) {

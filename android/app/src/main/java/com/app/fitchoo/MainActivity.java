@@ -1,3 +1,4 @@
+
 package com.app.fitchoo;
 
 import androidx.annotation.NonNull;
@@ -11,4 +12,3 @@ public class MainActivity extends FlutterActivity {
     GeneratedPluginRegistrant.registerWith(flutterEngine);
   }
 }
-

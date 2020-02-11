@@ -2,6 +2,7 @@ import 'package:fitchoo/pages/init.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fitchoo/states/user_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 

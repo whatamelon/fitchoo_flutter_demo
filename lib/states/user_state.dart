@@ -185,6 +185,17 @@ class UserState with ChangeNotifier {
     notifyListeners();
   }
 
+  setAutoLogin() async {
+    Dio dio = new Dio();
+    await dio.post("$baseUrl/users/signre/$_appType/push",
+        options: Options(
+            headers: {
+              "Authorization" : _accessToken,
+            }));
+    this._options = 'push';
+    notifyListeners();
+  }
+
   setUserHeight(i) async {
     Dio dio = new Dio();
     print('accessTokenForHeight------'+_accessToken);

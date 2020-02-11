@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fitchoo/states/user_state.dart';
 import 'package:fitchoo/pages/tab.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -19,6 +20,7 @@ class _AuthPageState extends State<AuthPage> {
   String _observer = '';
   bool check = false;
   bool _islogin = true;
+//  String autoLoginId = '';
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -248,7 +250,7 @@ class _AuthPageState extends State<AuthPage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5)),
             onPressed: () async{
-              setState(() {
+              setState(() async{
                 if(_islogin) {
                   if(_emailController.text == ''){
                     this._observer = '이메일을 입력해주세요.';
@@ -267,6 +269,14 @@ class _AuthPageState extends State<AuthPage> {
                     $user.setUserPassword(_passwordController.text);
                     $user.userLogIn();
                     if($user.accessToken != null || $user.accessToken !='') {
+
+//                      final SharedPreferences prefs = await SharedPreferences.getInstance();
+//                      prefs.setString('autoLoginId', _emailController.text);
+
+//                      setState(() {
+//                        autoLoginId = _emailController.text;
+//                      });
+
                       $user.login();
                       Navigator.pushReplacement(context,
                           MaterialPageRoute(builder: (context) => setHeightPage()));

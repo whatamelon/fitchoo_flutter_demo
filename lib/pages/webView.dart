@@ -1,10 +1,7 @@
-import 'dart:async';
-
 import 'package:fitchoo/states/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-//import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class webViewPage extends StatefulWidget {
   @override
@@ -12,37 +9,51 @@ class webViewPage extends StatefulWidget {
 }
 
 class _webViewPageState extends State<webViewPage> {
-  WebViewController _controller;
+  WebViewController _webViewController;
 
   final _key = UniqueKey();
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
-        body: Flex(
-          direction: Axis.vertical,
-          children: <Widget>[
-            Expanded(
-                child: WebView(
-                  key: _key,
-                  initialUrl: 'https://devfront.fitchoo.kr/home/',
-                  javascriptChannels: Set.from([
-                    JavascriptChannel(
-                        name: 'setHeight',
-                        onMessageReceived: (JavascriptMessage result) {
-                          print(result.message);
-                          UserState $user = Provider.of<UserState>(context, listen: false);
-                          $user.setUserHeight(result.message);
-                        })
-                  ]),
-                  onWebViewCreated: (WebViewController controller) {
-                    UserState $user = Provider.of<UserState>(context, listen: false);
-                    _controller.evaluateJavascript('callbackAuthToken(${$user.accessToken})');
-                  },
-                  javascriptMode: JavascriptMode.unrestricted,
-                )
-            ),
-          ],
-        )
+        body:Align(
+          alignment: Alignment.topLeft,
+          child: SafeArea(
+            left:true,
+            top:true,
+            right:true,
+            bottom: true,
+            minimum: const EdgeInsets.only(top:10),
+            child: WebView(
+              javascriptMode: JavascriptMode.unrestricted,
+                                      key: _key,
+                                      initialUrl: 'https://devfront.fitchoo.kr/',
+                                javascriptChannels: Set.from([
+                                  JavascriptChannel(
+                                      name: 'setHeight',
+                                      onMessageReceived: (JavascriptMessage result) {
+                                        print(result.message);
+                                        UserState $user = Provider.of<UserState>(context, listen: false);
+                                        $user.setUserHeight(result.message);
+                                      })
+                                ]),
+                                      onWebViewCreated: (WebViewController webViewController) async{
+                                        print("start");
+                                        _webViewController = webViewController;
+                                      },
+                                      onPageFinished:(String url) async{
+                                        print("finish   :   " + url);
+                                        UserState $user = Provider.of<UserState>(context, listen: false);
+                                        final res1 =  _webViewController.loadUrl('javascript:callbackAppType(\'android3\')');
+                                        final res2 =  _webViewController.loadUrl('javascript:callbackAuthToken(\'${$user.accessToken}\')');
+                                        final res3 =  _webViewController.loadUrl('javascript:callbackHeight(\'${$user.userHeight}\')');
+                                        print('Result for webView network finish1    :    $res1');
+                                        print('Result for webView network finish2    :    $res2');
+                                        print('Result for webView network finish3    :    $res3');
+                                      },
+                                    ),
+          ),
+        ),
     );
   }
 }
