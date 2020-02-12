@@ -2,6 +2,83 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+        <key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>fitchoonaver</string>
+                </array>
+            </dict>
+        </array>
+
+        <key>LSApplicationQueriesSchemes</key>
+        <array>
+            <string>naversearchapp</string>
+            <string>naversearchthirdlogin</string>
+        </array>
+        <key>kServiceAppUrlScheme</key>
+        <string>fitchoonaver</string>
+        <key>kConsumerKey</key>
+        <string>f51_VAeFxCjMYf8pWF6U</string>
+        <key>kConsumerSecret</key>
+        <string>CYPtF8_XtL</string>
+        <key>kServiceAppName</key>
+        <string>fitchoo</string>
+
+        <!-- http allows configurations -->
+        <key>NSAppTransportSecurity</key>
+        <dict>
+           <key>NSAllowsArbitraryLoads</key>
+           <true/>
+           <key>NSExceptionDomains</key>
+           <dict>
+              <key>naver.com</key>
+              <dict>
+                 <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                 <true/>
+                 <key>NSExceptionRequiresForwardSecrecy</key>
+                 <false/>
+                 <key>NSIncludesSubdomains</key>
+                 <true/>
+              </dict>
+              <key>naver.net</key>
+              <dict>
+                 <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                 <true/>
+                 <key>NSExceptionRequiresForwardSecrecy</key>
+                 <false/>
+                 <key>NSIncludesSubdomains</key>
+                 <true/>
+              </dict>
+           </dict>
+        </dict>
+    </dict>
+	<key>KAKAKO_APP_KEY</key>
+	<string>27f5ef1ec978a5c27873c41cbc6f60dc</string>
+	<key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>kakao27f5ef1ec978a5c27873c41cbc6f60dc</string>
+        <string>kakaokompassauth</string>
+        <string>storykompassauth</string>
+        <string>kakaolink</string>
+        <string>storylink</string>
+    </array>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string></string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>kakao27f5ef1ec978a5c27873c41cbc6f60dc</string>
+            </array>
+        </dict>
+    </array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

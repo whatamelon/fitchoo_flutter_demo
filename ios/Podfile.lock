@@ -1,0 +1,87 @@
+PODS:
+  - device_info (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_kakao_login (0.0.8):
+    - Flutter
+    - KakaoOpenSDK (~> 1.17.2)
+  - flutter_naver_login (0.0.1):
+    - Flutter
+    - naveridlogin-sdk-ios (~> 4.1.0)
+  - flutter_webview_plugin (0.0.1):
+    - Flutter
+  - KakaoOpenSDK (1.17.2):
+    - KakaoOpenSDK/KakaoCommon (= 1.17.2)
+    - KakaoOpenSDK/KakaoLink (= 1.17.2)
+    - KakaoOpenSDK/KakaoMessageTemplate (= 1.17.2)
+    - KakaoOpenSDK/KakaoNavi (= 1.17.2)
+    - KakaoOpenSDK/KakaoOpenSDK (= 1.17.2)
+  - KakaoOpenSDK/KakaoCommon (1.17.2)
+  - KakaoOpenSDK/KakaoLink (1.17.2):
+    - KakaoOpenSDK/KakaoCommon
+  - KakaoOpenSDK/KakaoMessageTemplate (1.17.2)
+  - KakaoOpenSDK/KakaoNavi (1.17.2):
+    - KakaoOpenSDK/KakaoCommon
+  - KakaoOpenSDK/KakaoOpenSDK (1.17.2)
+  - naveridlogin-sdk-ios (4.1.2)
+  - shared_preferences (0.0.1):
+    - Flutter
+  - shared_preferences_macos (0.0.1):
+    - Flutter
+  - shared_preferences_web (0.0.1):
+    - Flutter
+  - webview_flutter (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - device_info (from `.symlinks/plugins/device_info/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_kakao_login (from `.symlinks/plugins/flutter_kakao_login/ios`)
+  - flutter_naver_login (from `.symlinks/plugins/flutter_naver_login/ios`)
+  - flutter_webview_plugin (from `.symlinks/plugins/flutter_webview_plugin/ios`)
+  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - shared_preferences_macos (from `.symlinks/plugins/shared_preferences_macos/ios`)
+  - shared_preferences_web (from `.symlinks/plugins/shared_preferences_web/ios`)
+  - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
+
+SPEC REPOS:
+  trunk:
+    - KakaoOpenSDK
+    - naveridlogin-sdk-ios
+
+EXTERNAL SOURCES:
+  device_info:
+    :path: ".symlinks/plugins/device_info/ios"
+  Flutter:
+    :path: Flutter
+  flutter_kakao_login:
+    :path: ".symlinks/plugins/flutter_kakao_login/ios"
+  flutter_naver_login:
+    :path: ".symlinks/plugins/flutter_naver_login/ios"
+  flutter_webview_plugin:
+    :path: ".symlinks/plugins/flutter_webview_plugin/ios"
+  shared_preferences:
+    :path: ".symlinks/plugins/shared_preferences/ios"
+  shared_preferences_macos:
+    :path: ".symlinks/plugins/shared_preferences_macos/ios"
+  shared_preferences_web:
+    :path: ".symlinks/plugins/shared_preferences_web/ios"
+  webview_flutter:
+    :path: ".symlinks/plugins/webview_flutter/ios"
+
+SPEC CHECKSUMS:
+  device_info: cbf09d2ec12aa7110e0b09fabe54b5bd6c8efe74
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_kakao_login: 792d15a6f07557cb703f759ffa85ce0206b1fe84
+  flutter_naver_login: a6e5b1459494dd0cce25de2446ba603f9435d79a
+  flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
+  KakaoOpenSDK: 1fc43f9025e30a7c1f7c5342bf51744c6c93a500
+  naveridlogin-sdk-ios: cf8afccdb1793d4ecfcd5d46aa8729d8b5058c70
+  shared_preferences: 430726339841afefe5142b9c1f50cb6bd7793e01
+  shared_preferences_macos: f3f29b71ccbb56bf40c9dd6396c9acf15e214087
+  shared_preferences_web: 141cce0c3ed1a1c5bf2a0e44f52d31eeb66e5ea9
+  webview_flutter: bec7599de6bfbe8008a739aa3ebd7b364ea9d0cd
+
+PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
+
+COCOAPODS: 1.8.4
