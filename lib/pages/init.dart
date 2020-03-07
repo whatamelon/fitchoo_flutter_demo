@@ -9,9 +9,9 @@ import 'package:fitchoo/states/user_state.dart';
 import 'package:device_info/device_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-//import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
-//final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 class InitPage extends StatefulWidget {
 
@@ -29,7 +29,7 @@ class _InitPageState extends State<InitPage> {
     super.initState();
     initPlatform(_deviceInfo);
 //    autoLogIn();
-//    firebaseCloudMessaging_Listeners();
+    firebaseCloudMessaging_Listeners();
   }
 
 //  void autoLogIn() async {
@@ -291,24 +291,24 @@ class _InitPageState extends State<InitPage> {
   }
 
 
-//  void firebaseCloudMessaging_Listeners() {
-//
-//    _firebaseMessaging.getToken().then((token){
-//      print('token:'+token);
-//    });
-//
-//    _firebaseMessaging.configure(
-//      onMessage: (Map<String, dynamic> message) async {
-//        print('on message $message');
-//      },
-//      onResume: (Map<String, dynamic> message) async {
-//        print('on resume $message');
-//      },
-//      onLaunch: (Map<String, dynamic> message) async {
-//        print('on launch $message');
-//      },
-//    );
-//  }
+  void firebaseCloudMessaging_Listeners() {
+
+    _firebaseMessaging.getToken().then((token){
+      print('token:'+token);
+    });
+
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print('on message $message');
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print('on resume $message');
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print('on launch $message');
+      },
+    );
+  }
 }
 
 getIosDevice(IosDeviceInfo device) {

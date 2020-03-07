@@ -1,4 +1,3 @@
-
 package com.app.fitchoo;
 
 import androidx.annotation.NonNull;

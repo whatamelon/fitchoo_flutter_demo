@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>637450334826-lrffjial96qln7tpaguaguoltek258a1.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.637450334826-lrffjial96qln7tpaguaguoltek258a1</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDLaxtNHk91Khmn9VD-JFmtZy7b6y_yQJY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>637450334826</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.app.fitchoo</string>
+	<key>PROJECT_ID</key>
+	<string>pushtest-e2bc1</string>
+	<key>STORAGE_BUCKET</key>
+	<string>pushtest-e2bc1.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:637450334826:ios:3d47b29f07a36b7ea3d013</string>
+	<key>DATABASE_URL</key>
+	<string>https://pushtest-e2bc1.firebaseio.com</string>
+</dict>
+</plist>
