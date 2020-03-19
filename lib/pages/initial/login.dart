@@ -1,9 +1,14 @@
 import 'dart:io';
+import 'package:fitchoo/pages/init.dart';
+import 'package:fitchoo/pages/initial/rePwd.dart';
 import 'package:fitchoo/pages/initial/setHeight.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:fitchoo/states/user_state.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:fitchoo/pages/tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +25,12 @@ class _AuthPageState extends State<AuthPage> {
   String _observer = '';
   bool check = false;
   bool _islogin = true;
+  @override
+  void initState() {
+    super.initState();
+    Hive.initFlutter();
+//    autoLogIn();
+  }
 //  String autoLoginId = '';
   @override
   Widget build(BuildContext context) {
@@ -67,8 +78,8 @@ class _AuthPageState extends State<AuthPage> {
                                         onTap: _toggleCreateAccount
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
-                                      child: Text('|' , style: TextStyle(fontWeight: FontWeight.w800, fontSize: 40)),
+                                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                      child: Container(color: Colors.black, height:35, width:5),
                                     ),
                                     InkWell(
                                         child: Text('회원가입',
@@ -149,16 +160,25 @@ class _AuthPageState extends State<AuthPage> {
                 height: 8,
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Checkbox(
-                    value: check,
-                    onChanged: (bool newValue) {
-                    setState(() {
-                          check = newValue;
-                        });
-                      },
-                    ),
-                    Text("자동로그인"),
+                  Row(
+                    children: <Widget>[
+                      Checkbox(
+                        value: check,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            check = newValue;
+                          });
+                        },
+                      ),
+                      Text("자동로그인"),
+                    ],
+                  ),
+                  InkWell(
+                      child: Text('비밀번호를 잊으셨나요?'),
+                      onTap: _forgetPwd,
+                  ),
                 ]
                )
             ],
@@ -268,20 +288,31 @@ class _AuthPageState extends State<AuthPage> {
                     $user.setUserEmail(_emailController.text);
                     $user.setUserPassword(_passwordController.text);
                     $user.userLogIn();
-                    if($user.accessToken != null || $user.accessToken !='') {
-
-//                      final SharedPreferences prefs = await SharedPreferences.getInstance();
-//                      prefs.setString('autoLoginId', _emailController.text);
-
-//                      setState(() {
-//                        autoLoginId = _emailController.text;
-//                      });
+                    if($user.accessToken == null || $user.accessToken =='') {
+                      this._observer = '이미 존재하는 이메일입니다.';
+                    }else {
+                      var box = await Hive.openBox('userInfo');
+                      box.put('snsType', 'local');
+                      box.put('userEmail', _emailController.text);
+                      box.put('password', _passwordController.text);
+                      box.put('snsId', '');
+                      box.put('appType', $user.appType);
+                      box.put('pushKey', '');
+                      box.put('deviceInfo', $user.deviceInfo);
+                      box.put('options', check == true ? 'push':'default');
+                      box.put('accessToken', $user.accessToken);
+                      var box2 = Hive.box('userInfo');
+                      print('userInfo in Hive: $box2');
+                      await box.close();
 
                       $user.login();
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => setHeightPage()));
-                    }else {
-                      this._observer = '이미 존재하는 이메일입니다.';
+                      if($user.userHeight != null || $user .userHeight != 0) {
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) => TabPage()));
+                      } else {
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (context) => setHeightPage()));
+                      }
                     }
                   }
                 }
@@ -310,14 +341,29 @@ class _AuthPageState extends State<AuthPage> {
                     }
                     $user.setUserEmail(_emailController.text);
                     $user.setUserPassword(_passwordController.text);
-//                    $user.signUp();
-//                    if($user.signUpMes) {
-//                      $user.userLogIn();
+                    $user.signUp();
+                    if($user.signUpMes) {
+                      $user.userLogIn();
+
+                      var box = await Hive.openBox('userInfo');
+                      box.put('snsType', 'local');
+                      box.put('userEmail', _emailController.text);
+                      box.put('password', _passwordController.text);
+                      box.put('snsId', '');
+                      box.put('appType', $user.appType);
+                      box.put('pushKey', '');
+                      box.put('deviceInfo', $user.deviceInfo);
+                      box.put('options', 'push');
+                      box.put('accessToken', $user.accessToken);
+                      var box2 = Hive.box('userInfo');
+                      print('userInfo in Hive: $box2');
+                      await box.close();
+
                       Navigator.pushReplacement(context,
                           MaterialPageRoute(builder: (context) => setHeightPage()));
-//                    }else {
-//                      this._observer = '이미 존재하는 이메일입니다.';
-//                    }
+                    }else {
+                      this._observer = '회원가입에 실패했습니다.';
+                    }
                   }
                 }
               });
@@ -350,6 +396,11 @@ class _AuthPageState extends State<AuthPage> {
     });
   }
 
+
+  void _forgetPwd() {
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => RePwdPage()));
+  }
 }
 
 

@@ -1,4 +1,13 @@
 PODS:
+  - airplane_mode_detection (0.0.1):
+    - Flutter
+  - apple_sign_in (0.0.1):
+    - Flutter
+  - connectivity (0.0.1):
+    - Flutter
+    - Reachability
+  - connectivity_macos (0.0.1):
+    - Flutter
   - device_info (0.0.1):
     - Flutter
   - Flutter (1.0.0)
@@ -9,6 +18,8 @@ PODS:
     - Flutter
     - naveridlogin-sdk-ios (~> 4.1.0)
   - flutter_webview_plugin (0.0.1):
+    - Flutter
+  - fluttertoast (0.0.2):
     - Flutter
   - KakaoOpenSDK (1.17.2):
     - KakaoOpenSDK/KakaoCommon (= 1.17.2)
@@ -24,6 +35,11 @@ PODS:
     - KakaoOpenSDK/KakaoCommon
   - KakaoOpenSDK/KakaoOpenSDK (1.17.2)
   - naveridlogin-sdk-ios (4.1.2)
+  - path_provider (0.0.1):
+    - Flutter
+  - path_provider_macos (0.0.1):
+    - Flutter
+  - Reachability (3.2)
   - shared_preferences (0.0.1):
     - Flutter
   - shared_preferences_macos (0.0.1):
@@ -34,11 +50,18 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - airplane_mode_detection (from `.symlinks/plugins/airplane_mode_detection/ios`)
+  - apple_sign_in (from `.symlinks/plugins/apple_sign_in/ios`)
+  - connectivity (from `.symlinks/plugins/connectivity/ios`)
+  - connectivity_macos (from `.symlinks/plugins/connectivity_macos/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - Flutter (from `Flutter`)
   - flutter_kakao_login (from `.symlinks/plugins/flutter_kakao_login/ios`)
   - flutter_naver_login (from `.symlinks/plugins/flutter_naver_login/ios`)
   - flutter_webview_plugin (from `.symlinks/plugins/flutter_webview_plugin/ios`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+  - path_provider_macos (from `.symlinks/plugins/path_provider_macos/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - shared_preferences_macos (from `.symlinks/plugins/shared_preferences_macos/ios`)
   - shared_preferences_web (from `.symlinks/plugins/shared_preferences_web/ios`)
@@ -48,8 +71,17 @@ SPEC REPOS:
   trunk:
     - KakaoOpenSDK
     - naveridlogin-sdk-ios
+    - Reachability
 
 EXTERNAL SOURCES:
+  airplane_mode_detection:
+    :path: ".symlinks/plugins/airplane_mode_detection/ios"
+  apple_sign_in:
+    :path: ".symlinks/plugins/apple_sign_in/ios"
+  connectivity:
+    :path: ".symlinks/plugins/connectivity/ios"
+  connectivity_macos:
+    :path: ".symlinks/plugins/connectivity_macos/ios"
   device_info:
     :path: ".symlinks/plugins/device_info/ios"
   Flutter:
@@ -60,6 +92,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_naver_login/ios"
   flutter_webview_plugin:
     :path: ".symlinks/plugins/flutter_webview_plugin/ios"
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
+  path_provider_macos:
+    :path: ".symlinks/plugins/path_provider_macos/ios"
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
   shared_preferences_macos:
@@ -70,13 +108,21 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
 SPEC CHECKSUMS:
+  airplane_mode_detection: f38e13bc7a6d5d1ff7d8b87c93060625bf89e394
+  apple_sign_in: 7716c7ddfa195aeab7dec0dc374ef4ff45d1adb4
+  connectivity: 6e94255659cc86dcbef1d452ad3e0491bb1b3e75
+  connectivity_macos: e2e9731b6b22dda39eb1b128f6969d574460e191
   device_info: cbf09d2ec12aa7110e0b09fabe54b5bd6c8efe74
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_kakao_login: 792d15a6f07557cb703f759ffa85ce0206b1fe84
   flutter_naver_login: a6e5b1459494dd0cce25de2446ba603f9435d79a
   flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
+  fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
   KakaoOpenSDK: 1fc43f9025e30a7c1f7c5342bf51744c6c93a500
   naveridlogin-sdk-ios: cf8afccdb1793d4ecfcd5d46aa8729d8b5058c70
+  path_provider: fb74bd0465e96b594bb3b5088ee4a4e7bb1f2a9d
+  path_provider_macos: f760a3c5b04357c380e2fddb6f9db6f3015897e0
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   shared_preferences: 430726339841afefe5142b9c1f50cb6bd7793e01
   shared_preferences_macos: f3f29b71ccbb56bf40c9dd6396c9acf15e214087
   shared_preferences_web: 141cce0c3ed1a1c5bf2a0e44f52d31eeb66e5ea9

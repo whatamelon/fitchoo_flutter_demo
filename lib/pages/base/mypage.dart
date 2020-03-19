@@ -3,6 +3,8 @@ import 'package:flutter_kakao_login/flutter_kakao_login.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:provider/provider.dart';
 import 'package:fitchoo/states/user_state.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../init.dart';
 
@@ -13,6 +15,11 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
+  @override
+  void initState() {
+    super.initState();
+    Hive.initFlutter();
+  }
   @override
   Widget build(BuildContext context) {
     final $user = Provider.of<UserState>(context);
@@ -119,18 +126,25 @@ class _MyPageState extends State<MyPage> {
                             ),
                             onTap: () {
                               print('${lists[index]['code']}');
-                              if (lists[index]['code'] == '10') {
-                                if($user.snsType == 'kakao') {
-                                  _kakaoLogout();
-                                } else if($user.snsType == 'naver') {
-                                  _naverLogout();
-                                } else {
+                              setState(() async{
+                                if (lists[index]['code'] == '10') {
+                                  var box = await Hive.openBox('userInfo');
+                                  box.delete('accessToken');
+                                  var box2 = Hive.box('userInfo');
+                                  print('userInfo in Hive: $box2<dynamic>');
+                                  await box.close();
+                                  if($user.snsType == 'kakao') {
+                                    _kakaoLogout();
+                                  } else if($user.snsType == 'naver') {
+                                    _naverLogout();
+                                  } else {
+                                  }
                                   $user.userLogOut();
+                                  Navigator.pushReplacement(context,
+                                      MaterialPageRoute(builder: (context) => InitPage()));
+                                  $user.logout();
                                 }
-                                Navigator.pushReplacement(context,
-                                    MaterialPageRoute(builder: (context) => InitPage()));
-                                $user.logout();
-                              }
+                              });
                             }
                         );
                       },

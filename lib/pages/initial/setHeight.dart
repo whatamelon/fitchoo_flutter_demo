@@ -1,9 +1,13 @@
+import 'package:fitchoo/pages/base/home.dart';
+import 'package:fitchoo/pages/tab.dart';
 import 'package:fitchoo/pages/webView.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:fitchoo/states/user_state.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class setHeightPage extends StatefulWidget {
   @override
@@ -15,6 +19,7 @@ class _setHeightPageState extends State<setHeightPage> {
 
   void initState() {
     super.initState();
+    Hive.initFlutter();
     _heightController = TextEditingController();
   }
 
@@ -98,11 +103,16 @@ class _setHeightPageState extends State<setHeightPage> {
           Colors.black : Colors.red,
            shape: RoundedRectangleBorder(
                borderRadius: BorderRadius.circular(5)),
-           onPressed: () {
+           onPressed: () async{
+             var box = await Hive.openBox('userInfo');
+             box.put('userHeight', _heightController.text);
+             var box2 = Hive.box('userInfo');
+             print('userInfo in Hive: $box2');
+             await box.close();
              UserState $user = Provider.of<UserState>(context, listen: false);
              $user.setUserHeight(_heightController.text);
              Navigator.pushReplacement(context,
-                 MaterialPageRoute(builder: (context) => webViewPage()));
+                 MaterialPageRoute(builder: (context) => TabPage()));
        }),
      );
 

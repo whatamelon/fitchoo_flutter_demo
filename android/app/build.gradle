@@ -33,7 +33,7 @@ android {
 
     defaultConfig {
         applicationId "com.app.fitchoo"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -47,6 +47,10 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 flutter {
@@ -58,7 +62,4 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation group: 'com.kakao.sdk', name: 'usermgmt', version: '1.27.0'
-//    implementation 'com.android.support:multidex:1.0.3'
 }
-
-apply plugin: 'com.google.gms.google-services'

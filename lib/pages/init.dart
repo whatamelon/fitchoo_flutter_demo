@@ -1,17 +1,20 @@
+import 'dart:async';
+
+import 'package:fitchoo/pages/base/home.dart';
 import 'package:fitchoo/pages/initial/login.dart';
 import 'package:fitchoo/pages/tab.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:flutter_kakao_login/flutter_kakao_login.dart';
+import 'package:apple_sign_in/apple_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:fitchoo/states/user_state.dart';
 import 'package:device_info/device_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-import 'package:firebase_messaging/firebase_messaging.dart';
-
-final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class InitPage extends StatefulWidget {
 
@@ -27,9 +30,14 @@ class _InitPageState extends State<InitPage> {
   @override
   void initState() {
     super.initState();
+    Hive.initFlutter();
     initPlatform(_deviceInfo);
+    if(Platform.isIOS){
+      AppleSignIn.onCredentialRevoked.listen((_) {
+        print("Credentials revoked");
+      });
+    }
 //    autoLogIn();
-    firebaseCloudMessaging_Listeners();
   }
 
 //  void autoLogIn() async {
@@ -92,6 +100,8 @@ class _InitPageState extends State<InitPage> {
           _greenButton(size),
           Padding(padding: EdgeInsets.all(5)),
           _yellowButton(size),
+          Padding(padding: EdgeInsets.all(5)),
+          if(Platform.isIOS)_appleButton(size),
         ],
       ),
     );
@@ -142,7 +152,7 @@ class _InitPageState extends State<InitPage> {
               borderRadius: BorderRadius.circular(5)),
           splashColor: Colors.greenAccent,
           onPressed: () {
-            _naverLogin().then((result) {
+            _naverLogin().then((result) async{
               if(result.account.email == '' || result.account.email ==null) {
                 showDialog(
                     context: context,
@@ -174,6 +184,20 @@ class _InitPageState extends State<InitPage> {
                 $user.setUserEmail(result.account.email);
                 $user.setUserPassword('');
                 $user.userLogIn();
+                
+                var box = await Hive.openBox('userInfo');
+                box.put('snsType', 'naver');
+                box.put('userEmail', result.account.email);
+                box.put('password', '');
+                box.put('snsId', result.account.id);
+                box.put('appType', $user.appType);
+                box.put('pushKey', '');
+                box.put('deviceInfo', $user.deviceInfo);
+                box.put('options', 'push');
+                box.put('accessToken', $user.accessToken);
+                var box2 = Hive.box('userInfo');
+                print('userInfo in Hive: $box2');
+                await box.close();
                 if($user.accessToken == null || $user.accessToken == '') {
                 }
                 else{
@@ -205,7 +229,7 @@ class _InitPageState extends State<InitPage> {
               borderRadius: BorderRadius.circular(5)),
           splashColor: Colors.yellowAccent,
           onPressed: () {
-            _kakaoLogin().then((result) {
+            _kakaoLogin().then((result) async{
               if(result.account.userEmail == '' || result.account.userEmail ==null) {
                 showDialog(
                     context: context,
@@ -237,6 +261,21 @@ class _InitPageState extends State<InitPage> {
                 $user.setUserEmail(result.account.userEmail);
                 $user.setUserPassword('');
                 $user.userLogIn();
+
+                var box = await Hive.openBox('userInfo');
+                box.put('snsType', 'naver');
+                box.put('userEmail', result.account.userEmail);
+                box.put('password', '');
+                box.put('snsId', result.account.userID);
+                box.put('appType', $user.appType);
+                box.put('pushKey', '');
+                box.put('deviceInfo', $user.deviceInfo);
+                box.put('options', 'push');
+                box.put('accessToken', $user.accessToken);
+                var box2 = Hive.box('userInfo');
+                print('userInfo in Hive: $box2');
+                await box.close();
+
                 if($user.accessToken == null || $user.accessToken == '') {
                 }
                 else{
@@ -244,6 +283,78 @@ class _InitPageState extends State<InitPage> {
                 }
               }
             });
+          },
+        )
+    );
+  }
+
+  Widget _appleButton(Size size) {
+    return SizedBox(
+        width: size.width * 0.8,
+        height: 50,
+        child: FlatButton(
+          child: new Row(
+              children: <Widget>[
+                Icon(Icons.audiotrack, color: Colors.grey),
+                Padding(padding: EdgeInsets.only(left: size.width * 0.15)),
+                Text("애플계정으로 시작하기", style: TextStyle(fontSize: 15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),),
+              ]
+          ),
+          color: Colors.grey,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5)),
+          splashColor: Colors.white,
+          onPressed: () async{
+            if(await AppleSignIn.isAvailable()) {
+              final AuthorizationResult result = await
+              AppleSignIn.performRequests([
+                AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
+              ]);
+              switch (result.status) {
+                case AuthorizationStatus.authorized:
+                  print("애플로그인성공함: $result");
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => TabPage()));
+                  UserState $user = Provider.of<UserState>(context, listen: false);
+                  $user.setUserSNSType('apple');
+                  $user.setUserAppType('ios');
+                  $user.setUserSNSId('apple');
+                  $user.setUserEmail(result.credential.email);
+                  $user.setUserPassword('');
+                  $user.userLogIn();
+
+                  var box = await Hive.openBox('userInfo');
+                  box.put('snsType', 'naver');
+                  box.put('userEmail', result.credential.email);
+                  box.put('password', '');
+                  box.put('snsId', 'apple');
+                  box.put('appType', $user.appType);
+                  box.put('pushKey', '');
+                  box.put('deviceInfo', $user.deviceInfo);
+                  box.put('options', 'push');
+                  box.put('accessToken', $user.accessToken);
+                  var box2 = Hive.box('userInfo');
+                  print('userInfo in Hive: $box2');
+                  await box.close();
+
+                  if($user.accessToken == null || $user.accessToken == '') {
+                  }
+                  else{
+                    $user.login();
+                  }
+                  break;
+                case AuthorizationStatus.error:
+                  print("Sign in failed: ${result.error.localizedDescription}");
+                  break;
+                case AuthorizationStatus.cancelled:
+                  print('User cancelled');
+                  break;
+              }
+            }else{
+              print('Apple SignIn is not available for your device');
+            }
           },
         )
     );
@@ -286,39 +397,26 @@ class _InitPageState extends State<InitPage> {
     if (Platform.isIOS) {
       setState(() async {
         _deviceInfo = getIosDevice(await plugin.iosInfo);
+        print(_deviceInfo);
       });
     }
   }
-
-
-  void firebaseCloudMessaging_Listeners() {
-
-    _firebaseMessaging.getToken().then((token){
-      print('token:'+token);
-    });
-
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        print('on message $message');
-      },
-      onResume: (Map<String, dynamic> message) async {
-        print('on resume $message');
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        print('on launch $message');
-      },
-    );
-  }
 }
 
-getIosDevice(IosDeviceInfo device) {
+getIosDevice(IosDeviceInfo data) {
   return [
-    device.name,
-    device.systemName,
-    device.systemVersion,
-    device.model,
-    device.localizedModel,
-    device.identifierForVendor,
+    data.name,
+    data.systemName,
+    data.systemVersion,
+    data.model,
+    data.localizedModel,
+    data.identifierForVendor,
+    data.isPhysicalDevice,
+    data.utsname.sysname,
+    data.utsname.nodename,
+    data.utsname.release,
+    data.utsname.version,
+    data.utsname.machine,
   ];
 }
 

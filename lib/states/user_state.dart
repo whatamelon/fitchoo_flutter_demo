@@ -4,7 +4,6 @@ import 'dart:convert';
 
 const baseUrl = 'https://rest.fitchoo.kr';
 
-
 class UserState with ChangeNotifier {
 //  -----------------------------------
 //  State
@@ -13,13 +12,13 @@ class UserState with ChangeNotifier {
   bool _signUpMes = false;
   String _accessToken = '';
   String _userId = '';
-  String _userHeight = '';
+  int _userHeight = 0;
   String _userEmail = '';
   String _userPassword = '';
   String _snsType = '';
   String _snsId = '';
   String _appType = '';
-  String _deviceInfo = '';
+  List _deviceInfo = [];
   String _pushKey = '';
   String _options = '';
 
@@ -31,13 +30,13 @@ class UserState with ChangeNotifier {
     this._signUpMes = false;
     this._accessToken = '';
     this._userId = '';
-    this._userHeight = '';
+    this._userHeight = 0;
     this._userEmail = '';
     this._userPassword = '';
     this._snsType = '';
     this._snsId = '';
     this._appType = '';
-    this._deviceInfo = '';
+    this._deviceInfo = [];
     this._pushKey = '';
     this._options = '';
   }
@@ -61,7 +60,7 @@ class UserState with ChangeNotifier {
     return _userId;
   }
 
-  String get userHeight {
+  int get userHeight {
     return _userHeight;
   }
 
@@ -89,7 +88,7 @@ class UserState with ChangeNotifier {
     return _pushKey;
   }
 
-  String get deviceInfo {
+  List get deviceInfo {
     return _deviceInfo;
   }
 
@@ -113,7 +112,7 @@ class UserState with ChangeNotifier {
             "snsId": _snsId,
             "appType": _appType,
             "pushKey": _pushKey,
-            "deviceInfo": _deviceInfo,
+            "deviceInfo": '',
             "options": _options,
           });
       if(response.statusCode == 200) {
@@ -132,7 +131,18 @@ class UserState with ChangeNotifier {
   userLogIn() async {
     Dio dio = new Dio();
     Response response;
-    print('accessToken1------'+_accessToken);
+    var data = {
+      "snsType": _snsType,
+      "email": _userEmail,
+      "passwd": _userPassword,
+      "snsId": _snsId,
+      "appType": _appType,
+      "pushKey": _pushKey,
+      "deviceInfo": _deviceInfo,
+      "options": _options,
+    };
+    print('accessToken1------$_accessToken');
+    print('send data+ $data');
     try{
       response = await dio.post("$baseUrl/users/signin",
           data: {
@@ -142,7 +152,7 @@ class UserState with ChangeNotifier {
             "snsId": _snsId,
             "appType": _appType,
             "pushKey": _pushKey,
-            "deviceInfo": _deviceInfo,
+            "deviceInfo": '',
             "options": _options,
           });
       print('first+${response.data}');
@@ -164,6 +174,27 @@ class UserState with ChangeNotifier {
     notifyListeners();
   }
 
+  userTemppw(i) async{
+    Response response;
+    try{
+      response = await dio.put("$baseUrl/users/temppw",
+          data: {
+            "email": i,
+            "passwd": '',
+            "passwd2": '',
+          });
+      print(i);
+      if(response.statusCode == 200) {
+        print(response.data['result']);
+      }else {
+        print(response.data['result']);
+      }
+    }catch(e) {
+      print(e);
+    }
+    notifyListeners();
+  }
+
   userLogOut() async {
     Dio dio = new Dio();
     await dio.delete("$baseUrl/users");
@@ -180,7 +211,7 @@ class UserState with ChangeNotifier {
     notifyListeners();
   }
 
-  setAccessToken(i) {
+  setAccessToken(i) async{
     this._accessToken = i;
     notifyListeners();
   }
@@ -235,6 +266,7 @@ class UserState with ChangeNotifier {
 
   setUserDeviceInfo(i) {
     this._deviceInfo = i;
+    print(i);
     notifyListeners();
   }
 
