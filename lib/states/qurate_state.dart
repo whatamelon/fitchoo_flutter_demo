@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'package:fitchoo/states/user_state.dart';
 import 'package:provider/provider.dart';
-import 'package:fitchoo/models/qurate_model.dart';
 
 const baseUrl = 'https://rest.fitchoo.kr';
 
@@ -183,6 +182,10 @@ class QurateState with ChangeNotifier {
   String _qSwitchHero = '';
   List<QcatList> _qcatList = [];
   List<QmodelList> _qmodelList = [];
+  List _activeFirstCat = [];
+  List _activeSecCat = [];
+  List _pureCatList = [];
+
 
 
 //  -----------------------------------
@@ -207,6 +210,9 @@ class QurateState with ChangeNotifier {
     this._qSwitchHero = '';
     this._qcatList = [];
     this._qmodelList = [];
+    this._activeFirstCat = [];
+    this._activeSecCat = [];
+    this._pureCatList = [];
   }
 
 //  -----------------------------------
@@ -284,6 +290,18 @@ class QurateState with ChangeNotifier {
     return _qmodelList;
   }
 
+  List get activeFirstCat {
+    return _activeFirstCat;
+  }
+
+  List get activeSecCat {
+    return _activeSecCat;
+  }
+
+  List get pureCatList {
+    return _pureCatList;
+  }
+
 
 
 //  -----------------------------------
@@ -353,10 +371,19 @@ class QurateState with ChangeNotifier {
               }));
       if(response.statusCode == 200) {
         var les = response.data['result']['catList'];
+        this._pureCatList = les;
         list = les.map<QcatList>((json) => QcatList.fromJson(json)).toList();
         this._qcatList = list;
-        print(_qcatList);
-        print(_qcatList.toSet().toList());
+
+        List<String> newMap = [];
+        for (var code in les) {
+          newMap.add(code['cat1']);
+        }
+        var distinctMap = newMap.toSet().toList();
+        distinctMap.insert(0,'000');
+        print(distinctMap);
+        this._activeFirstCat = distinctMap;
+
         var les2 = response.data['result']['qmodelList'];
         list2 = les2.map<QmodelList>((json) => QmodelList.fromJson(json)).toList();
         this._qmodelList = list2;
@@ -364,6 +391,28 @@ class QurateState with ChangeNotifier {
     }catch(e) {
       print(e);
     }
+    notifyListeners();
+  }
+
+  setActiveSecCat(i) {
+    List getSecMap = [];
+    List<String> newMap = [];
+    for(var code in this._pureCatList) {
+      print(code['cat1']);
+      print(i['code']);
+
+      if(code['cat1'] == i['code']) {
+        getSecMap.add(code);
+      }
+    }
+
+    for(var code2 in getSecMap) {
+      newMap.add(code2['cat2']);
+    }
+    var distinctMap = newMap.toSet().toList();
+    distinctMap.insert(0,'000');
+    print('이건 디스팅트 맵$distinctMap');
+    this._activeSecCat = distinctMap;
     notifyListeners();
   }
 

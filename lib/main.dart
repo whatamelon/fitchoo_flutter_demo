@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fitchoo/pages/init.dart';
 import 'package:fitchoo/pages/base/home.dart';
 import 'package:fitchoo/pages/initial/splash.dart';
@@ -10,7 +12,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-void main() => runApp(MyApp());
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext context) {
+    return super.createHttpClient(context)
+      ..maxConnectionsPerHost = 5;
+  }
+}
+
+void main() {
+  HttpOverrides.global = MyHttpOverrides();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   final userState = UserState();

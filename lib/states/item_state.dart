@@ -59,15 +59,15 @@ class ItemState with ChangeNotifier {
   int _limit = 30;
   int _totCnt = 0;
   int _listCnt = 0;
-  String _cat1 = '';
-  String _cat2 = '';
+  Map<String, String> _cat1 = {'code': '000','name': '전체'};
+  Map<String, String> _cat2 = {'code': '000','name': '전체'};
   String _qid = '';
   String _fit1 = '';
   String _option = '';
   String _keyword = '';
-  String _hr = '';
-  String _pr = '10000r100000';
-  String _order = 'de';
+  String  _hr = '';
+  Map<String, String>  _pr = {'priceRange': '0r4000000','name': '전체'};
+  Map<String, String> _order = {'sortOrder': 'de','name': '정렬'};
   List<ItemList> _itemList = [];
   List<Map<String, String>> _secCatList = [];
 
@@ -79,15 +79,15 @@ class ItemState with ChangeNotifier {
     this._limit = 0;
     this._totCnt = 0;
     this._listCnt = 0;
-    this._cat1 = '';
-    this._cat2 = '';
+    this._cat1 = {'code': '000','name': '전체'};
+    this._cat2 = {'code': '000','name': '전체'};
     this._qid = '';
     this._fit1 = '';
     this._option = '';
     this._keyword = '';
     this._hr = '';
-    this._pr = '';
-    this._order = '';
+    this._pr = {'priceRange': '0r4000000','name': '전체'};
+    this._order = {'sortOrder': 'de','name': '정렬'};
     this._itemList = [];
     this._secCatList = [];
   }
@@ -111,11 +111,11 @@ class ItemState with ChangeNotifier {
     return _listCnt;
   }
 
-  String get cat1 {
+  Map<String,String> get cat1 {
     return _cat1;
   }
 
-  String get cat2 {
+  Map<String,String> get cat2 {
     return _cat2;
   }
 
@@ -139,11 +139,11 @@ class ItemState with ChangeNotifier {
     return _hr;
   }
 
-  String get pr {
+  Map<String,String> get pr {
     return _pr;
   }
 
-  String get order {
+  Map<String,String> get order {
     return _order;
   }
 
@@ -170,15 +170,15 @@ class ItemState with ChangeNotifier {
             "offset": _offset,
             "limit": 30,
             'height': height,
-            'cat1': _cat1,
-            'cat2': _cat2,
+            'cat1': _cat1['code'],
+            'cat2': _cat2['code'],
             'qid': _qid,
             'fit1': _fit1,
             'option': _option,
             'keyword': _keyword,
             'hr': _hr,
-            'pr': _pr,
-            'order': _order
+            'pr': _pr['priceRange'],
+            'order': _order['sortOrder']
           },
           options: Options(
               headers: {
@@ -233,6 +233,16 @@ class ItemState with ChangeNotifier {
 
   setSecCatSelect(i) async {
     this._cat2 = i;
+    notifyListeners();
+  }
+
+  setOrder(i) {
+    this._order = i;
+    notifyListeners();
+  }
+
+  setPrice(i) {
+    this._pr = i;
     notifyListeners();
   }
 

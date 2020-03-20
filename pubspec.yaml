@@ -38,6 +38,7 @@ dependencies:
   hive: ^1.4.1+1
   hive_flutter: ^0.3.0+2
   transparent_image: ^1.0.0
+  flutter_screenutil: ^1.0.2
 
 
 

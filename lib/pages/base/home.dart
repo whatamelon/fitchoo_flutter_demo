@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 20, 0, 0),
-                child: Text('인기 큐레이션', style: TextStyle(fontSize: 20),),
+                child: Text('인기 큐레이션', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),),
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 5),
@@ -131,8 +131,10 @@ class _HomePageState extends State<HomePage> {
                                 $qurate.setQUsername(qurations[index].iquserName);
                                 $qurate.setQTitle(qurations[index].ititle);
                                 $qurate.setQBody(qurations[index].ibody);
+                                print('4${qurations[index].ititle}');
                                 $qurate.getQurateInfo($user.accessToken);
                                 $item.setQid(qurations[index].iqitemId);
+                                print('3${qurations[index].ititle}');
                                 $item.getItemList($user.accessToken, $user.userHeight);
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (BuildContext context) => QurationIdPage()));
