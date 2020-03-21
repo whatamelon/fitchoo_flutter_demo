@@ -1,6 +1,6 @@
+import 'package:fitchoo/pages/base/search.dart';
 import 'package:flutter/material.dart';
 import 'package:fitchoo/pages/base/home.dart';
-import 'package:fitchoo/pages/base/items.dart';
 import 'package:fitchoo/pages/base/mypage.dart';
 import 'package:fitchoo/pages/base/models.dart';
 
@@ -17,7 +17,7 @@ class _TabPageState extends State<TabPage> {
   List<BottomNavigationBarItem> buildBottomNavBarItems() {
     return [
       BottomNavigationBarItem(icon : Icon(Icons.home), title: Text('홈')),
-      BottomNavigationBarItem(icon : Icon(Icons.dashboard), title: Text('상품보기')),
+      BottomNavigationBarItem(icon : Icon(Icons.search), title: Text('검색')),
       BottomNavigationBarItem(icon : Icon(Icons.format_align_left), title: Text('모델찾기')),
       BottomNavigationBarItem(icon : Icon(Icons.account_circle), title: Text('마이')),
     ];
@@ -36,7 +36,7 @@ class _TabPageState extends State<TabPage> {
       },
       children: <Widget>[
         HomePage(),
-        ItemsPage(),
+        SearchPage(),
         ModelsPage(),
         MyPage(),
       ],

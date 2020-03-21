@@ -371,22 +371,25 @@ class QurateState with ChangeNotifier {
               }));
       if(response.statusCode == 200) {
         var les = response.data['result']['catList'];
-        this._pureCatList = les;
-        list = les.map<QcatList>((json) => QcatList.fromJson(json)).toList();
-        this._qcatList = list;
+        if(les != null) {
+          this._pureCatList = les;
+          list = les.map<QcatList>((json) => QcatList.fromJson(json)).toList();
+          this._qcatList = list;
 
-        List<String> newMap = [];
-        for (var code in les) {
-          newMap.add(code['cat1']);
+          List<String> newMap = [];
+          for (var code in les) {
+            newMap.add(code['cat1']);
+          }
+          var distinctMap = newMap.toSet().toList();
+          distinctMap.insert(0,'000');
+          print(distinctMap);
+          this._activeFirstCat = distinctMap;
+
+          var les2 = response.data['result']['qmodelList'];
+          list2 = les2.map<QmodelList>((json) => QmodelList.fromJson(json)).toList();
+          this._qmodelList = list2;
         }
-        var distinctMap = newMap.toSet().toList();
-        distinctMap.insert(0,'000');
-        print(distinctMap);
-        this._activeFirstCat = distinctMap;
 
-        var les2 = response.data['result']['qmodelList'];
-        list2 = les2.map<QmodelList>((json) => QmodelList.fromJson(json)).toList();
-        this._qmodelList = list2;
       }
     }catch(e) {
       print(e);

@@ -4,6 +4,7 @@ import 'package:fitchoo/states/user_state.dart';
 import 'package:fitchoo/states/item_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -228,7 +229,13 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.network('$img_url${$qurate.qnewList[index].nimgItemFile}', fit:BoxFit.fitWidth)),
+                      child: FadeInImage.memoryNetwork(
+                          width:200,
+                          height:150,
+                          placeholder: kTransparentImage,
+                          image: '$img_url${$qurate.qnewList[index].nimgItemFile}',
+                          fit:BoxFit.fitWidth
+                      )),
                   Padding(
                     padding: EdgeInsets.only(top:8),
                   ),

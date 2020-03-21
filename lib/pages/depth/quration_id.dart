@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fitchoo/states/qurate_state.dart';
 import 'package:fitchoo/states/user_state.dart';
 import 'package:fitchoo/states/item_state.dart';
+import 'package:flutter_conditional_rendering/conditional_switch.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -22,7 +23,22 @@ class _QurationIdPageState extends State<QurationIdPage> {
   Map<String, String> _tempSecCat = {'code': '000','name': '전체'};
   Map<String, String> _tempOrder = {'sortOrder': 'de','name': '정렬'};
   Map<String, String> _tempPrice = {'priceRange': '0r4000000','name': '전체'};
+  Map<String, String> _tempFit = { 'fit1': "", 'name':"전체" };
 
+
+  String _filterIndex = '0';
+
+  List _filters = [
+    { 'index': '0', 'name': "카테고리" },
+    { 'index': '2', 'name': "정렬" },
+    { 'index': '3', 'name': "가격" },
+  ];
+
+  List _filters2 = [
+    { 'index': '1', 'name': "체형" },
+    { 'index': '2', 'name': "정렬" },
+    { 'index': '3', 'name': "가격" },
+  ];
 
   List _firstCateList = [
     { 'code': "000", 'name': "전체" },
@@ -37,6 +53,25 @@ class _QurationIdPageState extends State<QurationIdPage> {
     { 'code': "009", 'name': "쥬얼리" },
     { 'code': "010", 'name': "비치웨어" },
     { 'code': "011", 'name': "란제리/파자마" }
+  ];
+
+  List _fitList = [
+    { 'fit1': "ws", 'name':"어깨가 넓어요." },
+    { 'fit1': "tc", 'name':"종아리가 굵어요." },
+    { 'fit1': "fb", 'name':"배가 좀 나왔어요." },
+    { 'fit1': "tt", 'name':"허벅지가 좀 있는 편이에요." },
+    { 'fit1': "ns", 'name':"어깨가 좁아요." },
+    { 'fit1': "tf", 'name':"팔뚝에 살이 많아요." },
+    { 'fit1': "sn", 'name':"목이 짧은 편이에요." },
+    { 'fit1': "sl", 'name':"다리가 짧아요." },
+    { 'fit1': "np", 'name':"골반이 좁아요." },
+    { 'fit1': "bb", 'name':"가슴이 커요." },
+    { 'fit1': "tb", 'name':"가슴이 작아요." },
+    { 'fit1': "cl", 'name':"다리가 굽었어요." },
+    { 'fit1': "lf", 'name':"얼굴이 길어요." },
+    { 'fit1': "af", 'name':"얼굴이 각졌어요." },
+    { 'fit1': "rf", 'name':"얼굴이 동그래요." },
+    { 'fit1': "sb", 'name':"마른체형이에요." }
   ];
 
   List<Map<String,String>> allCat = [{'code': '000', 'name': '전체'}];
@@ -58,13 +93,11 @@ class _QurationIdPageState extends State<QurationIdPage> {
 
 
   List<Map<String, String>> _orderList = [
-    { 'sortOrder': "de", 'name': "정렬" },
     { 'sortOrder': "dr", 'name': "최신순" },
     { 'sortOrder': "pl", 'name': "가격 낮은순" },
     { 'sortOrder': "ph", 'name': "가격 높은순" }];
 
   List<Map<String, String>> _priceList = [
-    { 'priceRange': "0r4000000", 'name':"전체" },
     { 'priceRange': "0r20000", 'name':"2만원 이하" },
     { 'priceRange': "20000r50000", 'name':"2~5만원" },
     { 'priceRange': "50000r100000", 'name':"5~10만원" },
@@ -81,6 +114,8 @@ class _QurationIdPageState extends State<QurationIdPage> {
     $qurate.setActiveSecCat(allCat[0]);
     _tempFirstCat = {'code': '000','name': '전체'};
     _tempSecCat = {'code': '000','name': '전체'};
+
+    $qurate.qitemId == '3' ? _filterIndex = '1' : _filterIndex = '0';
 
     _scrollController.addListener(() {
       if(_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
@@ -228,7 +263,7 @@ class _QurationIdPageState extends State<QurationIdPage> {
                     ),
                   ),
                 ),
-                if($qurate.qitemId == '1')
+                $qurate.qitemId == '1' ?
                 SliverAppBar(
                   pinned: true,
                   automaticallyImplyLeading: false,
@@ -258,6 +293,9 @@ class _QurationIdPageState extends State<QurationIdPage> {
                           child: Text('5cm 차이')),
                     ],
                   ),
+                ):
+                SliverToBoxAdapter(
+                  child: Padding(padding: EdgeInsets.only(top: 1)),
                 ),
                 SliverAppBar(
                   key: dataKey,
@@ -268,19 +306,27 @@ class _QurationIdPageState extends State<QurationIdPage> {
                       $qurate.qitemId == '3' ?
                         GestureDetector(
                           onTap: () {
-                            _showBodytypeFilter($item, $user);
+                            _showCategory($qurate, $item, $user, context, '1');
                           },
-                          child: Chip(
-                            label : Text('체형'),
+                          child:
+                          $item.fit1 == '' ?
+                          Chip(
+                            backgroundColor: Colors.grey,
+                            label : Text('체형', style: TextStyle(color:Colors.black),),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+                          ):
+                          Chip(
+                            backgroundColor: Colors.black,
+                            label : Text('${$item.fit1}', style: TextStyle(color:Colors.white),),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
                           ),
                         ) :
                         GestureDetector(
                           onTap: () {
-                            _showCategory($qurate, $item, $user, context);
+                            _showCategory($qurate, $item, $user, context, '0');
                           },
                           child:
-                          _tempFirstCat['code'] == '000' ?
+                          $item.cat1['code'] == '000' ?
                           Chip(
                             backgroundColor: Colors.grey,
                             label : Text('전체'),
@@ -301,10 +347,10 @@ class _QurationIdPageState extends State<QurationIdPage> {
                       Padding(padding: EdgeInsets.only(right: 20),),
                       GestureDetector(
                         onTap: () {
-                          _showFilter($item, $user);
+                          _showCategory($qurate, $item, $user, context, '2');
                         },
                         child:
-                        _tempOrder['sortOrder'] == 'de' ?
+                        $item.order['sortOrder'] == 'de' ?
                         Chip(
                           backgroundColor: Colors.grey,
                           label : Text('정렬'),
@@ -319,10 +365,10 @@ class _QurationIdPageState extends State<QurationIdPage> {
                       Padding(padding: EdgeInsets.only(right: 20),),
                       GestureDetector(
                         onTap: () {
-                          _showFilter($item, $user);
+                          _showCategory($qurate, $item, $user, context, '3');
                         },
                         child:
-                        _tempPrice['priceRange'] == '0r4000000' ?
+                        $item.pr['priceRange'] == '0r4000000' ?
                         Chip(
                           backgroundColor: Colors.grey,
                           label : Text('가격'),
@@ -362,7 +408,7 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                   ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
                                       child: FadeInImage.memoryNetwork(
-                                        fit: BoxFit.cover,
+                                          fit: BoxFit.cover,
                                           width: 120,
                                           height: 160,
                                           placeholder: kTransparentImage,
@@ -454,13 +500,20 @@ class _QurationIdPageState extends State<QurationIdPage> {
     $item.resetItemList();
     $item.setFirstCatSelect('000');
     $item.setSecCatSelect('000');
-    _tempFirstCat = {'code': '000','name': '전체'};
-    _tempSecCat = {'code': '000','name': '전체'};
+    this._tempFirstCat = {'code': '000','name': '전체'};
+    this._tempSecCat = {'code': '000','name': '전체'};
+    this._tempOrder = {'sortOrder': 'de','name': '정렬'};
+    this._tempPrice = {'priceRange': '0r4000000','name': '전체'};
+    this._tempFit = { 'fit1': "", 'name':"전체" };
+    $item.setFit({ 'fit1': "", 'name':"전체" });
+    $item.setPrice(this._tempPrice);
+    $item.setOrder(this._tempOrder);
     Navigator.pop(context);
   }
 
-  _showCategory($qurate, $item, $user, context) {
+  _showCategory($qurate, $item, $user, context, index) {
     print('카테고리 클릭!');
+    this._filterIndex = index;
     showModalBottomSheet(
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
@@ -495,112 +548,52 @@ class _QurationIdPageState extends State<QurationIdPage> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 15, 0, 15),
-                    child: Text('카테고리', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,),),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: GridView.builder(
+                  Container(
+                    height:70,
+                    child:
+                    $qurate.qitemId == '3' ?
+                    ListView.builder(
+                        scrollDirection: Axis.horizontal,
                         shrinkWrap: true,
-                        itemCount: _firstCateList.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 5
-                        ),
+                        itemCount: _filters2.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return $qurate.activeFirstCat.indexOf(_firstCateList[index]['code']) == -1 ?
-                          Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.grey, style: BorderStyle.solid, width: 3),
-                                color: Colors.grey
-                            ),
-                            child: Center(child: Text('${_firstCateList[index]['name']}',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black),)),
-                          ):
-                          new InkWell(
-                            onTap: () => _secCatChange(_firstCateList[index], $qurate, $item, setState),
-                            child:
-                            _tempFirstCat['code'] == _firstCateList[index]['code'] ?
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3),
-                                  color: Colors.black
-                              ),
-                              child: Center(child: Text('${_firstCateList[index]['name']}',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),)),
-                            ) :
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3)
-                              ),
-                              child: Center(child: Text('${_firstCateList[index]['name']}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)),
-                            ),
+                          return new InkWell(
+                            onTap: () => _changeIndex(_filters2[index]['index'], setState),
+                              child:
+                              _filterIndex == _filters2[index]['index'] ?
+                              Text('${_filters2[index]['name']}',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.grey),):
+                              Text('${_filters2[index]['name']}',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),)
+                          );
+                        }
+                    ):
+                    ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        itemCount: _filters.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return new InkWell(
+                              onTap: () => _changeIndex(_filters[index]['index'], setState),
+                              child:
+                              _filterIndex == _filters[index]['index'] ?
+                              Text('${_filters[index]['name']}',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.grey),) :
+                              Text('${_filters[index]['name']}',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),)
                           );
                         }
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 15),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Divider(color: Colors.black,),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 15),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: GridView.builder(
-                        shrinkWrap: true,
-                        itemCount: $item.secCatList.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 5
-                        ),
-                        itemBuilder: (BuildContext context, int index) {
-                          return $qurate.activeSecCat.indexOf($item.secCatList[index]['code']) == -1 ?
-                          Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.grey, style: BorderStyle.solid, width: 3),
-                                color: Colors.grey
-                            ),
-                            child: Center(child: Text('${$item.secCatList[index]['name']}',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color:Colors.black),)),):
-                            InkWell(
-                            onTap: () => _secCatSelect($item.secCatList[index], $item, setState),
-                            child:
-                            _tempSecCat['code'] == $item.secCatList[index]['code'] ?
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3),
-                                color: Colors.black
-                              ),
-                              child: Center(child: Text('${$item.secCatList[index]['name']}',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color:Colors.white),)),):
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3)
-                              ),
-                              child: Center(child: Text('${$item.secCatList[index]['name']}',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)),),
-                          );
-                        }
-                    ),
+                  ConditionalSwitch.single<String>(
+                    context: context,
+                    valueBuilder: (BuildContext context) => _filterIndex,
+                    caseBuilders: {
+                      '0' : (BuildContext context) => _buildCategory($qurate, $item, setState),
+                      '1' : (BuildContext context) => _buildBodyType($item),
+                      '2' : (BuildContext context) => _buildSort($item),
+                      '3' : (BuildContext context) => _buildPrice($item),
+                    }
                   ),
                 ],
               ),
@@ -624,6 +617,12 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                 setState(() {
                                   this._tempFirstCat = {'code': '000','name': '전체'};
                                   this._tempSecCat = {'code': '000','name': '전체'};
+                                  this._tempOrder = {'sortOrder': 'de','name': '정렬'};
+                                  this._tempPrice = {'priceRange': '0r4000000','name': '전체'};
+                                  this._tempFit = { 'fit1': "", 'name':"전체" };
+                                  $item.setFit({ 'fit1': "", 'name':"전체" });
+                                  $item.setPrice(this._tempPrice);
+                                  $item.setOrder(this._tempOrder);
                                   $item.setSecCatList(this.allCat);
                                 });
                               },
@@ -645,6 +644,9 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                 onPressed: () {
                                   $item.setFirstCatSelect(this._tempFirstCat);
                                   $item.setSecCatSelect(this._tempSecCat);
+                                  $item.setFit(this._tempFit);
+                                  $item.setPrice(this._tempPrice);
+                                  $item.setOrder(this._tempOrder);
                                   $item.setOffset(0);
                                   $item.getItemList($user.accessToken, $user.userHeight);
                                   Scrollable.ensureVisible(dataKey.currentContext);
@@ -665,198 +667,180 @@ class _QurationIdPageState extends State<QurationIdPage> {
     });
   }
 
-  void _showFilter($item, $user) {
-    print('필터 클릭!');
-    showModalBottomSheet(
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(20),
-                topLeft: Radius.circular(20)
-            )
-        ),
-        context: context,
-        builder: (context){
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return Container(
-                height: 600,
-                child: Stack(
-                  children: <Widget>[
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15),
-                          child: Center(
-                            child: Container(
-                              width: 50,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 15, 0, 15),
-                          child: Text('카테고리', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,),),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                          child: GridView.builder(
-//                    physics: ClampingScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: _orderList.length,
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 10,
-                                  childAspectRatio: 5
-                              ),
-                              itemBuilder: (BuildContext context, int index) {
-                                return new InkWell(
-                                  onTap: () => _orderChange(_orderList[index], $item, setState),
-                                  child:
-                                  _tempOrder['sortOrder'] == _orderList[index]['sortOrder'] ?
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3),
-                                        color: Colors.black
-                                    ),
-                                    child: Center(child: Text('${_orderList[index]['name']}',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),)),
-                                  ) :
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3)
-                                    ),
-                                    child: Center(child: Text('${_orderList[index]['name']}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)),
-                                  ),
-                                );
-                              }
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 15),
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Divider(color: Colors.black,),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 15),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                          child: GridView.builder(
-//                      physics: ClampingScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: _priceList.length,
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 10,
-                                  childAspectRatio: 5
-                              ),
-                              itemBuilder: (BuildContext context, int index) {
-                                return new InkWell(
-                                  onTap: () => _priceChange(_priceList[index], $item, setState),
-                                  child:
-                                  _tempPrice['priceRange'] == _priceList[index]['priceRange'] ?
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3),
-                                        color: Colors.black
-                                    ),
-                                    child: Center(child: Text('${_priceList[index]['name']}',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color:Colors.white),)),):
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3)
-                                    ),
-                                    child: Center(child: Text('${_priceList[index]['name']}',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)),),
-                                );
-                              }
-                          ),
-                        ),
-                      ],
-                    ),
-                    Positioned(
-                      child: Align(
-                        alignment: FractionalOffset.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 15),
-                          child: Row(
-                            children: <Widget>[
-                              ButtonTheme(
-                                minWidth: 50,
-                                height:50,
-                                child: FlatButton(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(8))
-                                  ),
-                                  color: Colors.black12,
-                                  splashColor: Colors.grey,
-                                  onPressed: () {
-                                    setState(() {
-                                      this._tempOrder = {'sortOrder': 'de','name': '정렬'};
-                                      this._tempPrice = {'priceRange': '0r4000000','name': '전체'};
-                                      $item.setOrder(this._tempOrder);
-                                      $item.setPrice(this._tempPrice);
-                                    });
-                                  },
-                                  child: Icon(Icons.refresh, color: Colors.grey, size: 25,),
-                                ),
-                              ),
-                              Padding(padding: EdgeInsets.only(right:10)),
-                              Expanded(
-                                child: ButtonTheme(
-                                  minWidth: 200,
-                                  height: 50,
-                                  child: FlatButton(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(8))
-                                    ),
-                                    splashColor: Colors.redAccent,
-                                    color: Colors.red,
-                                    child: Text('적용', style: TextStyle(color:Colors.white, fontWeight: FontWeight.bold,fontSize: 20),),
-                                    onPressed: () {
-                                      $item.setOrder(this._tempOrder);
-                                      $item.setPrice(this._tempPrice);
-                                      $item.setOffset(0);
-                                      $item.getItemList($user.accessToken, $user.userHeight);
-                                      Scrollable.ensureVisible(dataKey.currentContext);
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    )],
-                ),
-              );
-            },
-          );
-        });
+
+  Widget _buildModels($qurate, img_url, index) {
+    return Container(
+      margin: EdgeInsets.only(left: 10),
+      child: Column(
+        children: <Widget>[
+          ClipOval(
+              child: Image.network('$img_url${$qurate.qmodelList[index].imgFaceFile}',
+                  fit:BoxFit.fitWidth, width: 60, height:60)),
+          Text('${$qurate.qmodelList[index].name}', style: TextStyle(fontSize: 12),)
+        ],
+      ),
+    );
   }
 
-  void _showBodytypeFilter($item, $user) {
-    print('체형 & 필터 클릭!');
+  _heightChange() {
+    print('키 바꿉니다잉~~~');
+  }
+
+  _changeIndex(i, StateSetter updateState) {
+    updateState(() {
+      print(i);
+      this._filterIndex = i;
+    });
+  }
+
+  Widget _buildCategory($qurate, $item, setState) {
+   return this._tempFirstCat['code'] == '000' ?
+    Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: _firstCateList.length,
+          itemBuilder: (BuildContext context, int index) {
+            return new InkWell(
+                onTap: () => _secCatChange(_firstCateList[index], $qurate, $item, setState),
+                child:Text('${_firstCateList[index]['name']}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black),)
+            );
+          }
+      ),
+    ):
+    Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: $item.secCatList.length,
+          itemBuilder: (BuildContext context, int index) {
+            return InkWell(
+                onTap: () => _secCatSelect($item.secCatList[index], $item, setState),
+                child: Text('${$item.secCatList[index]['name']}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color:Colors.black),)
+            );
+          }
+      ),
+    );
+  }
+
+  Widget _buildBodyType($item) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: GridView.builder(
+          shrinkWrap: true,
+          itemCount: _fitList.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 5
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            return new InkWell(
+              onTap: () => _orderChange(_fitList[index], $item, setState),
+              child:
+              _tempFit['fit1'] == _fitList[index]['fit1'] ?
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3),
+                    color: Colors.black
+                ),
+                child: Center(child: Text('${_fitList[index]['name']}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),)),
+              ) :
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3)
+                ),
+                child: Center(child: Text('${_fitList[index]['name']}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)),
+              ),
+            );
+          }
+      ),
+    );
+  }
+
+  Widget _buildSort($item) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: GridView.builder(
+//                    physics: ClampingScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: _orderList.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 5
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            return new InkWell(
+              onTap: () => _orderChange(_orderList[index], $item, setState),
+              child:
+              _tempOrder['sortOrder'] == _orderList[index]['sortOrder'] ?
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3),
+                    color: Colors.black
+                ),
+                child: Center(child: Text('${_orderList[index]['name']}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),)),
+              ) :
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3)
+                ),
+                child: Center(child: Text('${_orderList[index]['name']}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)),
+              ),
+            );
+          }
+      ),
+    );
+  }
+
+  Widget _buildPrice($item) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: GridView.builder(
+          shrinkWrap: true,
+          itemCount: _priceList.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 5
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            return new InkWell(
+              onTap: () => _priceChange(_priceList[index], $item, setState),
+              child:
+              _tempPrice['priceRange'] == _priceList[index]['priceRange'] ?
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3),
+                    color: Colors.black
+                ),
+                child: Center(child: Text('${_priceList[index]['name']}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color:Colors.white),)),):
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 3)
+                ),
+                child: Center(child: Text('${_priceList[index]['name']}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),)),),
+            );
+          }
+      ),
+    );
   }
 
   _secCatChange(i, $qurate, $item, StateSetter updateState) {
@@ -912,21 +896,6 @@ class _QurationIdPageState extends State<QurationIdPage> {
       this._tempSecCat = i;
     });
   }
-
-  Widget _buildModels($qurate, img_url, index) {
-    return Container(
-      margin: EdgeInsets.only(left: 10),
-      child: Column(
-        children: <Widget>[
-          ClipOval(
-            child: Image.network('$img_url${$qurate.qmodelList[index].imgFaceFile}',
-                fit:BoxFit.fitWidth, width: 60, height:60)),
-          Text('${$qurate.qmodelList[index].name}', style: TextStyle(fontSize: 12),)
-        ],
-      ),
-    );
-  }
-
   _orderChange(i, $item, StateSetter updateState) {
     print('정렬 바꿉니다잉~~~');
     updateState(() {
@@ -939,10 +908,6 @@ class _QurationIdPageState extends State<QurationIdPage> {
     updateState(() {
       this._tempPrice = i;
     });
-  }
-
-  _heightChange() {
-
   }
 
 }

@@ -246,6 +246,11 @@ class ItemState with ChangeNotifier {
     notifyListeners();
   }
 
+  setFit(i) {
+    this._fit1 = i['fit1'];
+    notifyListeners();
+  }
+
 
 
 }
