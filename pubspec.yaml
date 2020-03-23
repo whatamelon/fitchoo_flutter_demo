@@ -55,6 +55,20 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  fonts:
+    - family: Noto
+      fonts:
+        - asset: assets/fonts/NotoSansKR-Thin.otf
+          weight: 200
+        - asset: assets/fonts/NotoSansKR-Light.otf
+          weight: 400
+        - asset: assets/fonts/NotoSansKR-Regular.otf
+        - asset: assets/fonts/NotoSansKR-Medium.otf
+          weight: 600
+        - asset: assets/fonts/NotoSansKR-Bold.otf
+          weight: 800
+        - asset: assets/fonts/NotoSansKR-Black.otf
+          weight: 900
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fitchoo/pages/base/home.dart';
 import 'package:fitchoo/pages/initial/login.dart';
+import 'package:fitchoo/pages/initial/setHeight.dart';
 import 'package:fitchoo/pages/tab.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -172,7 +173,7 @@ class _InitPageState extends State<InitPage> {
                 );
               }else {
                 Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => TabPage()));
+                    MaterialPageRoute(builder: (context) => setHeightPage()));
                 UserState $user = Provider.of<UserState>(context, listen: false);
                 $user.setUserSNSType('naver');
                 if(Platform.isAndroid ){
@@ -249,7 +250,7 @@ class _InitPageState extends State<InitPage> {
                 );
               }else {
                 Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => TabPage()));
+                    MaterialPageRoute(builder: (context) => setHeightPage()));
                 UserState $user = Provider.of<UserState>(context, listen: false);
                 $user.setUserSNSType('kakao');
                 if(Platform.isAndroid ){
@@ -316,7 +317,7 @@ class _InitPageState extends State<InitPage> {
                 case AuthorizationStatus.authorized:
                   print("애플로그인성공함: $result");
                   Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => TabPage()));
+                      MaterialPageRoute(builder: (context) => setHeightPage()));
                   UserState $user = Provider.of<UserState>(context, listen: false);
                   $user.setUserSNSType('apple');
                   $user.setUserAppType('ios');

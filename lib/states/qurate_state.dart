@@ -12,15 +12,12 @@ class QcatList {
   String cat1 = '';
   String cat2 = '';
 
-  QcatList({
-      this.cat1,
-      this.cat2
-    });
+  QcatList({this.cat1, this.cat2});
 
   factory QcatList.fromJson(Map<String, dynamic> json) {
     return QcatList(
-        cat1: json["cat1"],
-        cat2: json["cat2"],
+      cat1: json["cat1"],
+      cat2: json["cat2"],
     );
   }
 }
@@ -30,11 +27,7 @@ class QmodelList {
   String name = '';
   String imgFaceFile = '';
 
-  QmodelList({
-    this.modelId,
-    this.name,
-    this.imgFaceFile
-  });
+  QmodelList({this.modelId, this.name, this.imgFaceFile});
 
   factory QmodelList.fromJson(Map<String, dynamic> json) {
     return QmodelList(
@@ -57,8 +50,7 @@ class QpopList {
   String pbody = '';
 
   QpopList(
-    {
-      this.pqitemId,
+      {this.pqitemId,
       this.pqcode,
       this.pclickCnt,
       this.pquserName,
@@ -66,8 +58,8 @@ class QpopList {
       this.pimgItemFile,
       this.pitemupDate,
       this.ptitle,
-      this.pbody
-    });
+      this.pbody});
+
   factory QpopList.fromJson(Map<String, dynamic> json) {
     return QpopList(
         pqitemId: json["qitemId"],
@@ -78,8 +70,7 @@ class QpopList {
         pimgItemFile: json["imgItemFile"],
         pitemupDate: json["itemupDate"],
         ptitle: json["title"],
-        pbody: json["body"]
-    );
+        pbody: json["body"]);
   }
 }
 
@@ -95,17 +86,16 @@ class QnewList {
   String nbody = '';
 
   QnewList(
-      {
-        this.nqitemId,
-        this.nqcode,
-        this.nclickCnt,
-        this.nquserName,
-        this.nimgFaceFile,
-        this.nimgItemFile,
-        this.nitemupDate,
-        this.ntitle,
-        this.nbody
-      });
+      {this.nqitemId,
+      this.nqcode,
+      this.nclickCnt,
+      this.nquserName,
+      this.nimgFaceFile,
+      this.nimgItemFile,
+      this.nitemupDate,
+      this.ntitle,
+      this.nbody});
+
   factory QnewList.fromJson(Map<String, dynamic> json) {
     return QnewList(
         nqitemId: json["qitemId"],
@@ -116,11 +106,9 @@ class QnewList {
         nimgItemFile: json["imgItemFile"],
         nitemupDate: json["itemupDate"],
         ntitle: json["title"],
-        nbody: json["body"]
-    );
+        nbody: json["body"]);
   }
 }
-
 
 class QitemList {
   String iqitemId = '';
@@ -134,17 +122,16 @@ class QitemList {
   String ibody = '';
 
   QitemList(
-      {
-        this.iqitemId,
-        this.iqcode,
-        this.iclickCnt,
-        this.iquserName,
-        this.iimgFaceFile,
-        this.iimgItemFile,
-        this.iitemupDate,
-        this.ititle,
-        this.ibody
-      });
+      {this.iqitemId,
+      this.iqcode,
+      this.iclickCnt,
+      this.iquserName,
+      this.iimgFaceFile,
+      this.iimgItemFile,
+      this.iitemupDate,
+      this.ititle,
+      this.ibody});
+
   factory QitemList.fromJson(Map<String, dynamic> json) {
     return QitemList(
         iqitemId: json["qitemId"],
@@ -155,8 +142,7 @@ class QitemList {
         iimgItemFile: json["imgItemFile"],
         iitemupDate: json["itemupDate"],
         ititle: json["title"],
-        ibody: json["body"]
-    );
+        ibody: json["body"]);
   }
 }
 
@@ -185,8 +171,6 @@ class QurateState with ChangeNotifier {
   List _activeFirstCat = [];
   List _activeSecCat = [];
   List _pureCatList = [];
-
-
 
 //  -----------------------------------
 //  set
@@ -302,12 +286,10 @@ class QurateState with ChangeNotifier {
     return _pureCatList;
   }
 
-
-
 //  -----------------------------------
 //  Action
 
-  setQOffset(i) async{
+  setQOffset(i) async {
     this._qOffset = i;
     notifyListeners();
   }
@@ -319,17 +301,11 @@ class QurateState with ChangeNotifier {
     List<QnewList> list2;
     List<QitemList> list3;
     Response response;
-    try{
+    try {
       response = await dio.get("$baseUrl/qitems",
-          queryParameters: {
-            "offset": _qOffset,
-            "limit": 10
-          },
-          options: Options(
-          headers: {
-          "Authorization" : i
-          }));
-      if(response.statusCode == 200) {
+          queryParameters: {"offset": _qOffset, "limit": 10},
+          options: Options(headers: {"Authorization": i}));
+      if (response.statusCode == 200) {
         print("ㅇㅋ 인기리스트 받아옴 -------${response.data['result']}");
 
         this._totCnt = jsonDecode(response.data['result']['totCnt']);
@@ -344,16 +320,15 @@ class QurateState with ChangeNotifier {
         this._qnewList = list2;
 
         var les3 = response.data['result']['qitemList'];
-        list3 = les3.map<QitemList>((json) => QitemList.fromJson(json)).toList();
-        if(_qOffset == 0) {
+        list3 =
+            les3.map<QitemList>((json) => QitemList.fromJson(json)).toList();
+        if (_qOffset == 0) {
           this._qitemList = list3;
         } else {
           this._qitemList.addAll(list3);
         }
-        print(_qOffset);
-        print(_qitemList);
       }
-    }catch(e) {
+    } catch (e) {
       print(e);
     }
     notifyListeners();
@@ -363,15 +338,13 @@ class QurateState with ChangeNotifier {
     List<QcatList> list;
     List<QmodelList> list2;
     Response response;
-    try{
+    try {
       response = await dio.get("$baseUrl/qitems/info/$_qitemId",
           options: Options(
-              headers: {
-                "Authorization" : i
-              }));
-      if(response.statusCode == 200) {
+              headers: {"Authorization": i, 'user-agent': 'android 1.0'}));
+      if (response.statusCode == 200) {
         var les = response.data['result']['catList'];
-        if(les != null) {
+        if (les != null) {
           this._pureCatList = les;
           list = les.map<QcatList>((json) => QcatList.fromJson(json)).toList();
           this._qcatList = list;
@@ -381,44 +354,45 @@ class QurateState with ChangeNotifier {
             newMap.add(code['cat1']);
           }
           var distinctMap = newMap.toSet().toList();
-          distinctMap.insert(0,'000');
-          print(distinctMap);
+          distinctMap.insert(0, '000');
           this._activeFirstCat = distinctMap;
 
           var les2 = response.data['result']['qmodelList'];
-          list2 = les2.map<QmodelList>((json) => QmodelList.fromJson(json)).toList();
+          list2 = les2
+              .map<QmodelList>((json) => QmodelList.fromJson(json))
+              .toList();
           this._qmodelList = list2;
+          print('모델리스트___$list2');
         }
-
       }
-    }catch(e) {
+    } catch (e) {
       print(e);
     }
+    notifyListeners();
+  }
+
+  resetQmodelList() {
+    this._qmodelList.clear();
     notifyListeners();
   }
 
   setActiveSecCat(i) {
     List getSecMap = [];
     List<String> newMap = [];
-    for(var code in this._pureCatList) {
-      print(code['cat1']);
-      print(i['code']);
-
-      if(code['cat1'] == i['code']) {
+    for (var code in this._pureCatList) {
+      if (code['cat1'] == i['code']) {
         getSecMap.add(code);
       }
     }
 
-    for(var code2 in getSecMap) {
+    for (var code2 in getSecMap) {
       newMap.add(code2['cat2']);
     }
     var distinctMap = newMap.toSet().toList();
-    distinctMap.insert(0,'000');
-    print('이건 디스팅트 맵$distinctMap');
+    distinctMap.insert(0, '000');
     this._activeSecCat = distinctMap;
     notifyListeners();
   }
-
 
   setQItemid(i) {
     this._qitemId = i;

@@ -18,47 +18,39 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>CFBundleURLTypes</key>
-        <array>
-            <dict>
-              <key>CFBundleTypeRole</key>
-              <string>Editor</string>
-              <key>CFBundleURLSchemes</key>
-              <array>
-                <string>kakao27f5ef1ec978a5c27873c41cbc6f60dc</string>
-              </array>
-            </dict>
-            <dict>
-                <key>CFBundleTypeRole</key>
-                <string>Editor</string>
-                <key>CFBundleURLSchemes</key>
-                <array>
-                    <string>fitchoonaver</string>
-                </array>
-            </dict>
-        </array>
-    <key>LSApplicationQueriesSchemes</key>
-        <array>
-            <string>naversearchapp</string>
-            <string>naversearchthirdlogin</string>
-            <string>kakao27f5ef1ec978a5c27873c41cbc6f60dc</string>
-            <string>kakaokompassauth</string>
-            <string>storykompassauth</string>
-            <string>kakaolink</string>
-            <string>storylink</string>
-        </array>
-        <key>kServiceAppUrlScheme</key>
-        <string>fitchoonaver</string>
-        <key>kConsumerKey</key>
-        <string>f51_VAeFxCjMYf8pWF6U</string>
-        <key>kConsumerSecret</key>
-        <string>CYPtF8_XtL</string>
-        <key>kServiceAppName</key>
-        <string>fitchoo</string>
-    <key>KAKAO_APP_KEY</key>
-    <string>27f5ef1ec978a5c27873c41cbc6f60dc</string>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kakao27f5ef1ec978a5c27873c41cbc6f60dc</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fitchoonaver</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>KAKAO_APP_KEY</key>
+	<string>27f5ef1ec978a5c27873c41cbc6f60dc</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>naversearchapp</string>
+		<string>naversearchthirdlogin</string>
+		<string>kakao27f5ef1ec978a5c27873c41cbc6f60dc</string>
+		<string>kakaokompassauth</string>
+		<string>storykompassauth</string>
+		<string>kakaolink</string>
+		<string>storylink</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -80,5 +72,13 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>kConsumerKey</key>
+	<string>f51_VAeFxCjMYf8pWF6U</string>
+	<key>kConsumerSecret</key>
+	<string>CYPtF8_XtL</string>
+	<key>kServiceAppName</key>
+	<string>fitchoo</string>
+	<key>kServiceAppUrlScheme</key>
+	<string>fitchoonaver</string>
 </dict>
 </plist>

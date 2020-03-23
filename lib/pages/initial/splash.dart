@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:fitchoo/pages/base/home.dart';
 import 'package:fitchoo/pages/init.dart';
 import 'package:fitchoo/pages/tab.dart';
+import 'package:fitchoo/states/qurate_state.dart';
 import 'package:fitchoo/states/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:airplane_mode_detection/airplane_mode_detection.dart';
@@ -78,6 +79,9 @@ class _SplashPageState extends State<SplashPage> {
 
   onDoneLoading() async {
     if(_autoLogin) {
+      UserState $user = Provider.of<UserState>(context, listen: false);
+      QurateState $qurate = Provider.of<QurateState>(context, listen: false);
+      $qurate.getQurateList($user.accessToken);
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => TabPage()));
     } else{
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => InitPage()));

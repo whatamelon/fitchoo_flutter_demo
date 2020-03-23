@@ -15,8 +15,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext context) {
-    return super.createHttpClient(context)
-      ..maxConnectionsPerHost = 5;
+    return super.createHttpClient(context)..maxConnectionsPerHost = 5;
   }
 }
 
@@ -39,11 +38,9 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (context) => qurateState),
           ChangeNotifierProvider(create: (context) => itemState)
         ],
-      child : MaterialApp(
-      theme: ThemeData(
-        primaryColor: PrimaryColor,
-      ),
-      home: SplashPage(),
-    ));
+        child: MaterialApp(
+          theme: ThemeData(primaryColor: PrimaryColor, fontFamily: 'Noto'),
+          home: SplashPage(),
+        ));
   }
 }

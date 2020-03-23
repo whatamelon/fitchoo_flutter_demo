@@ -18,20 +18,19 @@ class ItemList {
   String modelHeight = '';
   String modelId = '';
 
-  ItemList({
-    this.itemId,
-    this.cat1,
-    this.cat2,
-    this.uploadTime,
-    this.name,
-    this.price,
-    this.linkUrl,
-    this.imgFile,
-    this.info,
-    this.modelName,
-    this.modelHeight,
-    this.modelId
-  });
+  ItemList(
+      {this.itemId,
+      this.cat1,
+      this.cat2,
+      this.uploadTime,
+      this.name,
+      this.price,
+      this.linkUrl,
+      this.imgFile,
+      this.info,
+      this.modelName,
+      this.modelHeight,
+      this.modelId});
 
   factory ItemList.fromJson(Map<String, dynamic> json) {
     return ItemList(
@@ -59,15 +58,15 @@ class ItemState with ChangeNotifier {
   int _limit = 30;
   int _totCnt = 0;
   int _listCnt = 0;
-  Map<String, String> _cat1 = {'code': '000','name': '전체'};
-  Map<String, String> _cat2 = {'code': '000','name': '전체'};
+  Map<String, String> _cat1 = {'code': '000', 'name': '전체'};
+  Map<String, String> _cat2 = {'code': '000', 'name': '전체'};
   String _qid = '';
   String _fit1 = '';
   String _option = '';
   String _keyword = '';
-  String  _hr = '';
-  Map<String, String>  _pr = {'priceRange': '0r4000000','name': '전체'};
-  Map<String, String> _order = {'sortOrder': 'de','name': '정렬'};
+  String _hr = '';
+  Map<String, String> _pr = {'priceRange': '0r4000000', 'name': '전체'};
+  Map<String, String> _order = {'sortOrder': 'de', 'name': '정렬'};
   List<ItemList> _itemList = [];
   List<Map<String, String>> _secCatList = [];
 
@@ -79,15 +78,15 @@ class ItemState with ChangeNotifier {
     this._limit = 0;
     this._totCnt = 0;
     this._listCnt = 0;
-    this._cat1 = {'code': '000','name': '전체'};
-    this._cat2 = {'code': '000','name': '전체'};
+    this._cat1 = {'code': '000', 'name': '전체'};
+    this._cat2 = {'code': '000', 'name': '전체'};
     this._qid = '';
     this._fit1 = '';
     this._option = '';
     this._keyword = '';
     this._hr = '';
-    this._pr = {'priceRange': '0r4000000','name': '전체'};
-    this._order = {'sortOrder': 'de','name': '정렬'};
+    this._pr = {'priceRange': '0r4000000', 'name': '전체'};
+    this._order = {'sortOrder': 'de', 'name': '정렬'};
     this._itemList = [];
     this._secCatList = [];
   }
@@ -111,11 +110,11 @@ class ItemState with ChangeNotifier {
     return _listCnt;
   }
 
-  Map<String,String> get cat1 {
+  Map<String, String> get cat1 {
     return _cat1;
   }
 
-  Map<String,String> get cat2 {
+  Map<String, String> get cat2 {
     return _cat2;
   }
 
@@ -139,11 +138,11 @@ class ItemState with ChangeNotifier {
     return _hr;
   }
 
-  Map<String,String> get pr {
+  Map<String, String> get pr {
     return _pr;
   }
 
-  Map<String,String> get order {
+  Map<String, String> get order {
     return _order;
   }
 
@@ -155,7 +154,6 @@ class ItemState with ChangeNotifier {
     return _secCatList;
   }
 
-
 //  -----------------------------------
 //  Action
 
@@ -164,7 +162,7 @@ class ItemState with ChangeNotifier {
   Future<List<ItemList>> getItemList(i, height) async {
     List<ItemList> list;
     Response response;
-    try{
+    try {
       response = await dio.get("$baseUrl/items/32/all",
           queryParameters: {
             "offset": _offset,
@@ -180,54 +178,48 @@ class ItemState with ChangeNotifier {
             'pr': _pr['priceRange'],
             'order': _order['sortOrder']
           },
-          options: Options(
-              headers: {
-                "Authorization" : i
-              }));
-      if(response.statusCode == 200) {
+          options: Options(headers: {"Authorization": i}));
+      if (response.statusCode == 200) {
         this._totCnt = jsonDecode(response.data['result']['totCnt']);
         this._listCnt = jsonDecode(response.data['result']['listCnt']);
         var les = response.data['result']['itemList'];
         list = les.map<ItemList>((json) => ItemList.fromJson(json)).toList();
-        if(this._offset == 0) {
+        print('상품리스트_____$list');
+        print('카디비_____${this._offset}');
+        if (this._offset == 0) {
           this._itemList = list;
         } else {
           this._itemList.addAll(list);
         }
-
-        print('offset은?___ $_offset');
-        print('상품리스트 매핑____$_itemList');
       }
-    }catch(e) {
+    } catch (e) {
       print(e);
     }
     notifyListeners();
   }
 
-  setOffset(i) async{
+  setOffset(i) async {
     this._offset = i;
     notifyListeners();
   }
 
-  setQid(i) async{
+  setQid(i) async {
     this._qid = i;
     notifyListeners();
   }
 
-  resetItemList() async{
+  resetItemList() async {
     this._itemList.clear();
-    print('리스트 초기화함!$_itemList');
     notifyListeners();
   }
 
-  setFirstCatSelect(i) async{
+  setFirstCatSelect(i) async {
     this._cat1 = i;
     notifyListeners();
   }
 
-  setSecCatList(i) async{
+  setSecCatList(i) async {
     this._secCatList = i;
-    print('이게 세컨리스트$_secCatList');
     notifyListeners();
   }
 
@@ -250,7 +242,4 @@ class ItemState with ChangeNotifier {
     this._fit1 = i['fit1'];
     notifyListeners();
   }
-
-
-
 }

@@ -288,7 +288,7 @@ class _AuthPageState extends State<AuthPage> {
                     $user.setUserEmail(_emailController.text);
                     $user.setUserPassword(_passwordController.text);
                     $user.userLogIn();
-                    if($user.accessToken == null || $user.accessToken =='') {
+                    if($user.accessToken == null) {
                       this._observer = '이미 존재하는 이메일입니다.';
                     }else {
                       var box = await Hive.openBox('userInfo');
