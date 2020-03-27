@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:fitchoo/pages/base/home.dart';
 import 'package:fitchoo/pages/initial/login.dart';
+import 'package:fitchoo/pages/initial/privacy.dart';
 import 'package:fitchoo/pages/initial/setHeight.dart';
+import 'package:fitchoo/pages/initial/terms.dart';
 import 'package:fitchoo/pages/tab.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,72 +59,119 @@ class _InitPageState extends State<InitPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery
-        .of(context)
-        .size;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: _rootBody(size, context)
     );
   }
 
   Widget _rootBody(Size size, BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Image.asset('assets/black_logo.png'),
-          Text("내 키에 꼭 맞는 모델과 상품",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-          Padding(padding: EdgeInsets.all(80)),
-          _redButton(size, context),
-          Padding(padding: EdgeInsets.all(10)),
-          Row(
-              children: <Widget>[
-                Padding(padding: EdgeInsets.all(20)),
-                Expanded(
-                    child: Divider(
-                        color: Colors.black
-                    )
-                ),
-                Padding(padding: EdgeInsets.all(15)),
-                Text("또는", style: TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.w700)),
-                Padding(padding: EdgeInsets.all(15)),
-                Expanded(
-                    child: Divider(
-                        color: Colors.black
-                    )
-                ),
-                Padding(padding: EdgeInsets.all(20)),
-              ]
+    return Stack(
+      children: <Widget> [
+        Positioned.fill(
+        child: Image(
+          image: AssetImage('assets/initBack.png'),
+          fit : BoxFit.fill,
           ),
-          Padding(padding: EdgeInsets.all(10)),
-          _greenButton(size),
-          Padding(padding: EdgeInsets.all(5)),
-          _yellowButton(size),
-          Padding(padding: EdgeInsets.all(5)),
-          if(Platform.isIOS)_appleButton(size),
-        ],
-      ),
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top:100),
+              child: Image.asset('assets/fitchoo_logo.png' ,width: size.width * 0.6,),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+//                Padding(padding: EdgeInsets.all(30)),
+                _yellowButton(size),
+                Padding(padding: EdgeInsets.all(5)),
+                _greenButton(size),
+                Padding(padding: EdgeInsets.all(5)),
+                if(Platform.isIOS)_appleButton(size),
+                Padding(padding: EdgeInsets.all(5)),
+                Row(
+                  children: <Widget>[
+                    Padding(padding: EdgeInsets.all(10)),
+                    Expanded(
+                        child: Divider(
+                            color: Colors.white
+                        )
+                    ),
+                    Padding(padding: EdgeInsets.all(18)),
+                    Text("또는", style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w700, color:Colors.white)),
+                    Padding(padding: EdgeInsets.all(18)),
+                    Expanded(
+                        child: Divider(
+                            color: Colors.white
+                        )
+                    ),
+                    Padding(padding: EdgeInsets.all(10)),
+                  ]
+                ),
+                Padding(padding: EdgeInsets.all(10)),
+                _redButton(size, context),
+                Padding(padding: EdgeInsets.all(10)),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Text('위의 버튼을 누르면 ',style: TextStyle(color:Colors.white),),
+                        InkWell(
+                          onTap:() {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => PrivacyPage()));
+                          },
+                          child: Text('개인정보 처리방침 ',style: TextStyle(color:Colors.white,decoration: TextDecoration.underline),)
+                        ),
+                        Text(' 및 ',style: TextStyle(color:Colors.white),),
+                        InkWell(
+                          onTap:() {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => TermsPage()));
+                          },
+                          child: Text('이용약관',style: TextStyle(color:Colors.white,decoration: TextDecoration.underline),)
+                        ),
+                        Text('을',style: TextStyle(color:Colors.white),),
+                      ],
+                    ),
+                    Text('읽고 동의한 것으로 간주합니다.',style: TextStyle(color:Colors.white),)
+                  ],
+                )
+              ],
+            )
+          ],
+        ),
+      ]
     );
   }
 
   Widget _redButton(Size size, BuildContext context) {
     return SizedBox(
-        width: size.width * 0.8,
-        height: 50,
+        width: size.width * 0.9,
+        height: 60,
         child: FlatButton(
           child: new Row(
               children: <Widget>[
-                Icon(Icons.audiotrack, color: Colors.white),
+                Padding(
+                  padding: const EdgeInsets.only(left:5),
+                  child: Image.asset('assets/f_logo.png', fit: BoxFit.fitWidth, width:18),
+                ),
                 Padding(padding: EdgeInsets.only(left: size.width * 0.15)),
-                Text("핏츄계정으로 시작하기", style: TextStyle(fontSize: 15,
+                Text("핏츄계정으로 시작하기", style: TextStyle(fontSize: 17,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold),),
+                    fontWeight: FontWeight.normal),),
               ]
           ),
-          color: Colors.red,
+          color: Color(0XFFec3e39),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5)),
           splashColor: Colors.redAccent,
@@ -136,19 +185,22 @@ class _InitPageState extends State<InitPage> {
 
   Widget _greenButton(Size size) {
     return SizedBox(
-        width: size.width * 0.8,
-        height: 50,
+        width: size.width * 0.9,
+        height: 60,
         child: FlatButton(
           child: new Row(
               children: <Widget>[
-                Icon(Icons.audiotrack, color: Colors.white),
+                Padding(
+                  padding: const EdgeInsets.only(left:2),
+                  child: Image.asset('assets/naver_icon.png', fit: BoxFit.fitWidth, width:23),
+                ),
                 Padding(padding: EdgeInsets.only(left: size.width * 0.15)),
-                Text("네이버 아이디로 시작하기", style: TextStyle(fontSize: 15,
+                Text("네이버 계정으로 시작하기", style: TextStyle(fontSize: 17,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold),),
+                    fontWeight: FontWeight.normal),),
               ]
           ),
-          color: Colors.green,
+          color: Color(0xFF1EC800),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5)),
           splashColor: Colors.greenAccent,
@@ -199,11 +251,14 @@ class _InitPageState extends State<InitPage> {
                 var box2 = Hive.box('userInfo');
                 print('userInfo in Hive: $box2');
                 await box.close();
-                if($user.accessToken == null || $user.accessToken == '') {
-                }
-                else{
-                  $user.login();
-                }
+
+                Timer(Duration(seconds: 1), () async{
+                  if($user.accessToken == null || $user.accessToken == '') {
+                  }
+                  else{
+                    $user.login();
+                  }
+                });
               }
             });
           },
@@ -213,19 +268,19 @@ class _InitPageState extends State<InitPage> {
 
   Widget _yellowButton(Size size) {
     return SizedBox(
-        width: size.width * 0.8,
-        height: 50,
+        width: size.width * 0.9,
+        height: 60,
         child: FlatButton(
           child: new Row(
               children: <Widget>[
-                Icon(Icons.audiotrack, color: Colors.white),
+                Image.asset('assets/kakao_icon.png', fit: BoxFit.fitWidth, width:25),
                 Padding(padding: EdgeInsets.only(left: size.width * 0.15)),
-                Text("카카오계정으로 시작하기", style: TextStyle(fontSize: 15,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold),),
+                Text("카카오계정으로 시작하기", style: TextStyle(fontSize: 17,
+                    color: Color(0XFF3c1e1e),
+                    fontWeight: FontWeight.normal),),
               ]
           ),
-          color: Colors.yellow,
+          color: Color(0xFFf7e318),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5)),
           splashColor: Colors.yellowAccent,
@@ -277,11 +332,13 @@ class _InitPageState extends State<InitPage> {
                 print('userInfo in Hive: $box2');
                 await box.close();
 
-                if($user.accessToken == null || $user.accessToken == '') {
-                }
-                else{
-                  $user.login();
-                }
+                Timer(Duration(seconds: 1), () async{
+                  if($user.accessToken == null || $user.accessToken == '') {
+                  }
+                  else{
+                    $user.login();
+                  }
+                });
               }
             });
           },
@@ -291,19 +348,22 @@ class _InitPageState extends State<InitPage> {
 
   Widget _appleButton(Size size) {
     return SizedBox(
-        width: size.width * 0.8,
-        height: 50,
+        width: size.width * 0.9,
+        height: 60,
         child: FlatButton(
           child: new Row(
               children: <Widget>[
-                Icon(Icons.audiotrack, color: Colors.grey),
+                Padding(
+                  padding: const EdgeInsets.only(left:3),
+                  child: Image.asset('assets/apple_icon.png', fit: BoxFit.fitWidth, width:23),
+                ),
                 Padding(padding: EdgeInsets.only(left: size.width * 0.15)),
-                Text("애플계정으로 시작하기", style: TextStyle(fontSize: 15,
+                Text("애플 계정으로 시작하기", style: TextStyle(fontSize: 17,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold),),
+                    fontWeight: FontWeight.normal),),
               ]
           ),
-          color: Colors.grey,
+          color: Colors.black,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5)),
           splashColor: Colors.white,
@@ -340,11 +400,13 @@ class _InitPageState extends State<InitPage> {
                   print('userInfo in Hive: $box2');
                   await box.close();
 
-                  if($user.accessToken == null || $user.accessToken == '') {
-                  }
-                  else{
-                    $user.login();
-                  }
+                  Timer(Duration(seconds: 1), () async{
+                    if($user.accessToken == null || $user.accessToken == '') {
+                    }
+                    else{
+                      $user.login();
+                    }
+                  });
                   break;
                 case AuthorizationStatus.error:
                   print("Sign in failed: ${result.error.localizedDescription}");

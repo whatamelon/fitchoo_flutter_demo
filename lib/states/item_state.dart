@@ -53,7 +53,6 @@ class ItemList {
 class ItemState with ChangeNotifier {
 //  -----------------------------------
 //  State
-
   int _offset = 0;
   int _limit = 30;
   int _totCnt = 0;
@@ -240,6 +239,11 @@ class ItemState with ChangeNotifier {
 
   setFit(i) {
     this._fit1 = i['fit1'];
+    notifyListeners();
+  }
+
+  setSearch(i) {
+    this._keyword = i;
     notifyListeners();
   }
 }

@@ -1,3 +1,6 @@
+import 'package:fitchoo/pages/depth/contact.dart';
+import 'package:fitchoo/pages/initial/privacy.dart';
+import 'package:fitchoo/pages/initial/terms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_kakao_login/flutter_kakao_login.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
@@ -28,64 +31,40 @@ class _MyPageState extends State<MyPage> {
 
   Widget _buildAppBar() {
     return AppBar(
-      title: Image.asset(
-        'assets/black_logo.png',
-        width: 120,
-      ),
-      actions: <Widget>[
-        IconButton(
-            icon: Icon(Icons.favorite_border), iconSize: 22, onPressed: () {}),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 2, 10, 0),
-          child: IconButton(icon: Icon(Icons.search), onPressed: () {}),
-        ),
-      ],
+      automaticallyImplyLeading: false,
+      centerTitle: true,
+      title: Text('마이', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),)
     );
   }
 
   Widget _buildBody($user) {
     final lists = [
-      {
-        'title': '키',
-        'code': '1',
-      },
-      {
-        'title': '내가 팔로우한 모델',
-        'code': '2',
-      },
-      {
-        'title': '찜',
-        'code': '3',
-      },
-      {
-        'title': '비밀번호 변경',
-        'code': '4',
-      },
-      {
-        'title': '이용 문의',
-        'code': '5',
-      },
-      {
-        'title': '이용 약관',
-        'code': '6',
-      },
-      {
-        'title': '개인 정보 취급 방침',
-        'code': '7',
-      },
-      {
-        'title': '모델 등록 문의',
-        'code': '8',
-      },
-      {
-        'title': '알림 설정',
-        'code': '9',
-      },
-      {
-        'title': '로그아웃',
-        'code': '10',
-      },
-    ];
+    {
+      'title': '이용 문의',
+      'code': '1',
+      'icon': Icons.live_help
+    },
+    {
+      'title': '이용 약관',
+      'code': '2',
+      'icon': Icons.list
+    },
+    {
+      'title': '개인 정보 취급 방침',
+      'code': '3',
+      'icon': Icons.verified_user
+    },
+    {
+      'title': '알림 설정',
+      'code': '4',
+      'icon': Icons.notifications
+    },
+    {
+      'title': '로그아웃',
+      'code': '5',
+      'icon': Icons.input
+    },
+  ];
     return
       Scaffold(
           body: SingleChildScrollView(
@@ -105,76 +84,75 @@ class _MyPageState extends State<MyPage> {
                   Padding(
                     padding: EdgeInsets.all(30),
                   ),
-                  ListView.separated(
+                  ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
                       itemCount: lists.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                            title: Padding(
-                              padding: const EdgeInsets.fromLTRB(25, 0, 0, 0),
-                              child: Container(
-                                height: 45,
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text('${lists[index]["title"]}')
-                                    ]
-                                ),
+                        return Padding(
+                            padding: EdgeInsets.fromLTRB(25, 15, 0, 15),
+                            child: InkWell(
+                              onTap: () {
+                                switch (lists[index]['code']) {
+                                  case '1' :
+                                    Navigator.push(context,MaterialPageRoute(builder: (context) => ContactPage()));
+                                    break;
+                                  case '2' :
+                                    Navigator.push(context,MaterialPageRoute(builder: (context) => TermsPage()));
+                                    break;
+                                  case '3' :
+                                    Navigator.push(context,MaterialPageRoute(builder: (context) => PrivacyPage()));
+                                    break;
+                                  case '4' :
+
+                                    break;
+                                  case '5' :
+                                    _logOut($user);
+                                    break;
+                                }
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                      Icon(
+                                        lists[index]['icon'],
+                                        size: 35,
+                                        color: Color(0XFFbbbbbb)),
+                                  Padding(padding: const EdgeInsets.only(left:15),
+                                    child: Text('${lists[index]['title']}', style: TextStyle(fontSize: 20,),),
+                                  )
+                                ],
                               ),
                             ),
-                            onTap: () {
-                              print('${lists[index]['code']}');
-                              setState(() async{
-                                if (lists[index]['code'] == '10') {
-                                  var box = await Hive.openBox('userInfo');
-                                  box.delete('accessToken');
-                                  var box2 = Hive.box('userInfo');
-                                  print('userInfo in Hive: $box2<dynamic>');
-                                  await box.close();
-                                  if($user.snsType == 'kakao') {
-                                    _kakaoLogout();
-                                  } else if($user.snsType == 'naver') {
-                                    _naverLogout();
-                                  } else {
-                                  }
-                                  $user.userLogOut();
-                                  Navigator.pushReplacement(context,
-                                      MaterialPageRoute(builder: (context) => InitPage()));
-                                  $user.logout();
-                                }
-                              });
-                            }
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        if (index == 3 || index == 7) {
-                          return Divider(
-                            height: 20,
-                            color: Color(0xffececec),
-                            thickness: 10,
                           );
-                        }
-                        else {
-                          return Divider(
-                            color: Color(0xffececec),
-                            thickness: 1,
-                          );
-                        }
                       }
-                  ),
-                  Padding(
-                      padding: EdgeInsets.only(top: 10)
-                  ),
-                  Container(
-                    height: 40,
-                    color: Color(0xffececec),
                   )
                 ],
               )
           )
       );
+  }
+  
+  void _logOut($user) {
+    setState(() async{
+        var box = await Hive.openBox('userInfo');
+        box.delete('accessToken');
+        var box2 = Hive.box('userInfo');
+        print('userInfo in Hive: $box2<dynamic>');
+        await box.close();
+        if($user.snsType == 'kakao') {
+          _kakaoLogout();
+        } else if($user.snsType == 'naver') {
+          _naverLogout();
+        } else {
+        }
+        $user.userLogOut();
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => InitPage()));
+        $user.logout();
+      
+    });
   }
 
   Future<void> _kakaoLogout() async {

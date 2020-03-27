@@ -18,7 +18,7 @@ class QurationIdPage extends StatefulWidget {
 class _QurationIdPageState extends State<QurationIdPage> {
   final GlobalKey<AnimatedListState> _aniKey = GlobalKey();
   final dataKey = new GlobalKey();
-  final ScrollController _scrollController = new ScrollController();
+  final ScrollController _qscrollController = new ScrollController();
   Map<String, String> _tempFirstCat = {'code': '000', 'name': '전체'};
   Map<String, String> _tempSecCat = {'code': '000', 'name': '전체'};
   Map<String, String> _tempOrder = {'sortOrder': 'de', 'name': '정렬'};
@@ -143,45 +143,39 @@ class _QurationIdPageState extends State<QurationIdPage> {
 
   @override
   void initState() {
-    super.initState();
-    print('큐레이션세부 들어왔어?');
-    UserState $user = Provider.of<UserState>(context, listen: false);
-    ItemState $item = Provider.of<ItemState>(context, listen: false);
-    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
-      SchedulerBinding.instance.addPostFrameCallback((_) => initialContents(context));
-    }
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        $item.setOffset($item.offset + 10);
-        $item.getItemList($user.accessToken, $user.userHeight);
-      } else {}
-    });
+      super.initState();
+      print('큐레이션세부 들어왔어?');
+      UserState $user = Provider.of<UserState>(context, listen: false);
+      ItemState $item = Provider.of<ItemState>(context, listen: false);
+      QurateState $qurate = Provider.of<QurateState>(context, listen: false);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) => initialContents(context, $user, $item, $qurate));
+      _qscrollController.addListener(() {
+        if (_qscrollController.position.pixels == _qscrollController.position.maxScrollExtent) {
+          $item.setOffset($item.offset + 10);
+          $item.getItemList($user.accessToken, $user.userHeight);
+        } else {}
+      });
   }
 
-  void initialContents(contents) {
-    ItemState $item = Provider.of<ItemState>(context, listen: false);
-    QurateState $qurate = Provider.of<QurateState>(context, listen: false);
-
+  void initialContents(context, $user, $item, $qurate) {
     $item.setSecCatList(allCat);
     $qurate.setActiveSecCat(allCat[0]);
     _tempFirstCat = {'code': '000', 'name': '전체'};
     _tempSecCat = {'code': '000', 'name': '전체'};
 
     $qurate.qitemId == '3' ? _filterIndex = '1' : _filterIndex = '0';
-
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _qscrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final String img_url =
-        "https://s3.ap-northeast-2.amazonaws.com/image.fitchoo";
+    final String img_url = "https://s3.ap-northeast-2.amazonaws.com/image.fitchoo";
     QurateState $qurate = Provider.of<QurateState>(context);
     UserState $user = Provider.of<UserState>(context);
     ItemState $item = Provider.of<ItemState>(context);
@@ -198,7 +192,7 @@ class _QurationIdPageState extends State<QurationIdPage> {
           child: SafeArea(
             top: true,
             child: CustomScrollView(
-              controller: _scrollController,
+              controller: _qscrollController,
               slivers: <Widget>[
                 SliverAppBar(
                   automaticallyImplyLeading: false,
@@ -498,79 +492,81 @@ class _QurationIdPageState extends State<QurationIdPage> {
                         childAspectRatio: 0.5),
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
-                        return Card(
-                            semanticContainer: true,
-                            clipBehavior: Clip.none,
-                            elevation: 0,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Stack(
-                                  children: <Widget>[
-                                    ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: FadeInImage.memoryNetwork(
-                                            fit: BoxFit.cover,
-                                            width: 120,
-                                            height: 160,
-                                            placeholder: kTransparentImage,
-                                            image:
-                                                '$img_url${$item.itemList[index].imgFile}')),
-                                    Positioned(
-                                      top: 5,
-                                      left: 5,
-                                      child: DecoratedBox(
-                                        decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(3))),
-                                        child: Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              6, 3, 6, 3),
-                                          child: Text(
-                                            'N',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold),
+                        return InkWell(
+                          onTap: () => print('$img_url${$item.itemList[index].imgFile}'),
+                          child: Card(
+                              semanticContainer: true,
+                              clipBehavior: Clip.none,
+                              elevation: 0,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Stack(
+                                    children: <Widget>[
+                                      ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
+                                          child: FadeInImage.memoryNetwork(
+                                              fit: BoxFit.cover,
+                                              width: 120,
+                                              height: 160,
+                                              placeholder: kTransparentImage,
+                                              image:'$img_url${$item.itemList[index].imgFile}')),
+                                      Positioned(
+                                        top: 5,
+                                        left: 5,
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(3))),
+                                          child: Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                6, 3, 6, 3),
+                                            child: Text(
+                                              'N',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    Positioned(
-                                        top: 3,
-                                        right: 4,
-                                        child: Icon(
-                                          Icons.favorite,
-                                          color: Colors.grey,
-                                          size: 25,
-                                        )),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 12),
-                                ),
-                                Text(
-                                  _fixPrice($item.itemList[index].price),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  $item.itemList[index].name,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 11,
+                                      Positioned(
+                                          top: 3,
+                                          right: 4,
+                                          child: Icon(
+                                            Icons.favorite,
+                                            color: Colors.grey,
+                                            size: 25,
+                                          )),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ));
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 12),
+                                  ),
+                                  Text(
+                                    _fixPrice($item.itemList[index].price),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    $item.itemList[index].name,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              )),
+                        );
                       },
                       childCount: $item.itemList.length,
                     ),
@@ -589,8 +585,10 @@ class _QurationIdPageState extends State<QurationIdPage> {
       return 'i${$qurate.imgItemFile}';
     } else if ($qurate.qSwitchHero == 'p') {
       return 'p${$qurate.imgItemFile}';
-    } else {
+    } else if ($qurate.qSwitchHero == 'n') {
       return 'n${$qurate.imgItemFile}';
+    } else {
+      return 'r${$qurate.imgItemFile}';
     }
   }
 
@@ -1107,7 +1105,6 @@ class _QurationIdPageState extends State<QurationIdPage> {
   void beforeRouteOut() {
     ItemState $item = Provider.of<ItemState>(context, listen: false);
     QurateState $qurate = Provider.of<QurateState>(context, listen: false);
-    _scrollController.dispose();
     $item.setOffset(0);
     print('나갈때 카디비____${$item.offset}');
     $item.resetItemList();

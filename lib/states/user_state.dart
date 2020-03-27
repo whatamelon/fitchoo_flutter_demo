@@ -117,13 +117,14 @@ class UserState with ChangeNotifier {
           });
       if(response.statusCode == 200) {
         print(response.data['result']);
-        this._userId = jsonDecode(response.data['result']['userId']);
+        var st = jsonDecode(response.data['result']['userId']);
+        this._userId = "$st";
         this._signUpMes = true;
       }else {
         this._signUpMes = false;
       }
     }catch(e) {
-      print(e);
+      print('cr error--------$e');
     }
     notifyListeners();
   }

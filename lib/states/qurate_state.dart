@@ -320,8 +320,7 @@ class QurateState with ChangeNotifier {
         this._qnewList = list2;
 
         var les3 = response.data['result']['qitemList'];
-        list3 =
-            les3.map<QitemList>((json) => QitemList.fromJson(json)).toList();
+        list3 = les3.map<QitemList>((json) => QitemList.fromJson(json)).toList();
         if (_qOffset == 0) {
           this._qitemList = list3;
         } else {
@@ -341,7 +340,7 @@ class QurateState with ChangeNotifier {
     try {
       response = await dio.get("$baseUrl/qitems/info/$_qitemId",
           options: Options(
-              headers: {"Authorization": i, 'user-agent': 'android 1.0'}));
+              headers: {"Authorization": i}));
       if (response.statusCode == 200) {
         var les = response.data['result']['catList'];
         if (les != null) {
@@ -358,11 +357,9 @@ class QurateState with ChangeNotifier {
           this._activeFirstCat = distinctMap;
 
           var les2 = response.data['result']['qmodelList'];
-          list2 = les2
-              .map<QmodelList>((json) => QmodelList.fromJson(json))
-              .toList();
+          list2 = les2.map<QmodelList>((json) => QmodelList.fromJson(json)).toList();
           this._qmodelList = list2;
-          print('모델리스트___$list2');
+          print('모델리스트___$les2');
         }
       }
     } catch (e) {
