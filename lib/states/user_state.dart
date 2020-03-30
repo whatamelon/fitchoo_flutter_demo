@@ -10,6 +10,7 @@ class UserState with ChangeNotifier {
 
   bool _loogedIn = false;
   bool _signUpMes = false;
+  String _signStr = '';
   String _accessToken = '';
   String _userId = '';
   int _userHeight = 0;
@@ -28,6 +29,7 @@ class UserState with ChangeNotifier {
   UserState() {
     this._loogedIn = false;
     this._signUpMes = false;
+    this._signStr = '';
     this._accessToken = '';
     this._userId = '';
     this._userHeight = 0;
@@ -51,6 +53,11 @@ class UserState with ChangeNotifier {
   bool get signUpMes {
     return _signUpMes;
   }
+
+  String get signStr {
+    return _signStr;
+  }
+
 
   String get accessToken {
     return _accessToken;
@@ -115,15 +122,23 @@ class UserState with ChangeNotifier {
             "deviceInfo": '',
             "options": _options,
           });
-      if(response.statusCode == 200) {
-        print(response.data['result']);
+      if(response.data['status'] == 200) {
+        print('로그인리쥴트${response.data['result']}');
         var st = jsonDecode(response.data['result']['userId']);
         this._userId = "$st";
         this._signUpMes = true;
-      }else {
+      } else if (response.data['status'] == 511) {
+        this._signStr = '다른 이메일을 사용해주세요';
+        this._signUpMes = false;
+      } else if (response.data['status'] == 512) {
+        this._signStr = '가입에 실패했습니다.';
+        this._signUpMes = false;
+      }
+      else {
         this._signUpMes = false;
       }
     }catch(e) {
+      this._signUpMes = false;
       print('cr error--------$e');
     }
     notifyListeners();
@@ -165,11 +180,19 @@ class UserState with ChangeNotifier {
 
         print('accessToken2-------$_accessToken');
         this._signUpMes = true;
-      }else {
+      } else if (response.data['status'] == 501) {
+        this._signStr = '가입되지 않은 사용자 입니다.';
+        this._signUpMes = false;
+      } else if(response.data['status'] == 502) {
+        this._signStr = '가입되지 않은 사용자 입니다.';
+        this._signUpMes = false;
+      }
+      else {
         print('로그인 에러-------${response.data}');
         this._signUpMes = false;
       }
     }catch(e) {
+      this._signUpMes = false;
       print('login error--------$e');
     }
     notifyListeners();

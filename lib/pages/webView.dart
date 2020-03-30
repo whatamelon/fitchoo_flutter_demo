@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class webViewPage extends StatefulWidget {
+  final String url;
+
+  webViewPage({Key key, this.url}) : super(key: key);
   @override
   _webViewPageState createState() => _webViewPageState();
 }
@@ -27,29 +30,29 @@ class _webViewPageState extends State<webViewPage> {
             child: WebView(
               javascriptMode: JavascriptMode.unrestricted,
                                       key: _key,
-                                      initialUrl: 'https://devfront.fitchoo.kr/',
-                                javascriptChannels: Set.from([
-                                  JavascriptChannel(
-                                      name: 'setHeight',
-                                      onMessageReceived: (JavascriptMessage result) {
-                                        print(result.message);
-                                        UserState $user = Provider.of<UserState>(context, listen: false);
-                                        $user.setUserHeight(result.message);
-                                      })
-                                ]),
+                                      initialUrl: widget.url,
+//                                      javascriptChannels: Set.from([
+//                                        JavascriptChannel(
+//                                            name: 'setHeight',
+//                                            onMessageReceived: (JavascriptMessage result) {
+//                                              print(result.message);
+//                                              UserState $user = Provider.of<UserState>(context, listen: false);
+//                                              $user.setUserHeight(result.message);
+//                                            })
+//                                      ]),
                                       onWebViewCreated: (WebViewController webViewController) async{
-                                        print("start");
+                                        print("start  :   ${widget.url}");
                                         _webViewController = webViewController;
                                       },
                                       onPageFinished:(String url) async{
-                                        print("finish   :   " + url);
-                                        UserState $user = Provider.of<UserState>(context, listen: false);
-                                        final res1 =  _webViewController.loadUrl('javascript:callbackAppType(\'android3\')');
-                                        final res2 =  _webViewController.loadUrl('javascript:callbackAuthToken(\'${$user.accessToken}\')');
-                                        final res3 =  _webViewController.loadUrl('javascript:callbackHeight(\'${$user.userHeight}\')');
-                                        print('Result for webView network finish1    :    $res1');
-                                        print('Result for webView network finish2    :    $res2');
-                                        print('Result for webView network finish3    :    $res3');
+                                        print("finish   :  ${widget.url}");
+//                                        UserState $user = Provider.of<UserState>(context, listen: false);
+//                                        final res1 =  _webViewController.loadUrl('javascript:callbackAppType(\'android3\')');
+//                                        final res2 =  _webViewController.loadUrl('javascript:callbackAuthToken(\'${$user.accessToken}\')');
+//                                        final res3 =  _webViewController.loadUrl('javascript:callbackHeight(\'${$user.userHeight}\')');
+//                                        print('Result for webView network finish1    :    $res1');
+//                                        print('Result for webView network finish2    :    $res2');
+//                                        print('Result for webView network finish3    :    $res3');
                                       },
                                     ),
           ),

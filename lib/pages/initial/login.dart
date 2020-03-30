@@ -260,10 +260,14 @@ class _AuthPageState extends State<AuthPage> {
 
                       Timer(Duration(seconds: 1), () async{
                         if($user.accessToken == null) {
-                          this._observer = '없는 회원 정보입니다. 회원가입을 해주세요.';
+                          setState(() {
+                            this._observer = $user.signStr;
+                          });
                         }
                         else if ($user.accessToken == ''){
-                          this._observer = '로그인 버튼을 한 번 더 눌러주세요.';
+                          setState(() {
+                            this._observer = $user.signStr;
+                          });
                         }
                         else {
                           var box = await Hive.openBox('userInfo');

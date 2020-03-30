@@ -1,11 +1,7 @@
 import 'dart:async';
-
-import 'package:fitchoo/pages/base/home.dart';
 import 'package:fitchoo/pages/initial/login.dart';
-import 'package:fitchoo/pages/initial/privacy.dart';
 import 'package:fitchoo/pages/initial/setHeight.dart';
-import 'package:fitchoo/pages/initial/terms.dart';
-import 'package:fitchoo/pages/tab.dart';
+import 'package:fitchoo/pages/webView.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
@@ -27,8 +23,8 @@ class InitPage extends StatefulWidget {
 
 class _InitPageState extends State<InitPage> {
   List _deviceInfo = <dynamic>[];
-//  String autoLoginId = '';
   static final DeviceInfoPlugin plugin = DeviceInfoPlugin();
+  String _url = '';
 
   @override
   void initState() {
@@ -40,38 +36,23 @@ class _InitPageState extends State<InitPage> {
         print("Credentials revoked");
       });
     }
-//    autoLogIn();
   }
-
-//  void autoLogIn() async {
-//    final SharedPreferences prefs = await SharedPreferences.getInstance();
-//    final String userId = prefs.getString('username');
-//
-//    UserState $user = Provider.of<UserState>(context, listen: false);
-//    if (userId != null) {
-//      setState(() {
-//        $user.login();
-//        autoLoginId = userId;
-//      });
-//      return;
-//    }
-//  }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: _rootBody(size, context)
+      body: _rootBody(size, context, _url)
     );
   }
 
-  Widget _rootBody(Size size, BuildContext context) {
+  Widget _rootBody(Size size, BuildContext context, url) {
     return Stack(
       children: <Widget> [
         Positioned.fill(
         child: Image(
           image: AssetImage('assets/initBack.png'),
-          fit : BoxFit.fill,
+          fit : BoxFit.cover,
           ),
         ),
         Column(
@@ -127,16 +108,20 @@ class _InitPageState extends State<InitPage> {
                         Text('위의 버튼을 누르면 ',style: TextStyle(color:Colors.white),),
                         InkWell(
                           onTap:() {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => PrivacyPage()));
+                            setState(() {
+                              this._url = 'https://fitchoo.kr/privacy.html';
+                              goWebview();
+                            });
                           },
                           child: Text('개인정보 처리방침 ',style: TextStyle(color:Colors.white,decoration: TextDecoration.underline),)
                         ),
                         Text(' 및 ',style: TextStyle(color:Colors.white),),
                         InkWell(
                           onTap:() {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => TermsPage()));
+                            setState(() {
+                              this._url = 'https://fitchoo.kr/terms.html';
+                              goWebview();
+                            });
                           },
                           child: Text('이용약관',style: TextStyle(color:Colors.white,decoration: TextDecoration.underline),)
                         ),
@@ -224,8 +209,6 @@ class _InitPageState extends State<InitPage> {
                     )
                 );
               }else {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => setHeightPage()));
                 UserState $user = Provider.of<UserState>(context, listen: false);
                 $user.setUserSNSType('naver');
                 if(Platform.isAndroid ){
@@ -236,27 +219,74 @@ class _InitPageState extends State<InitPage> {
                 $user.setUserSNSId(result.account.id);
                 $user.setUserEmail(result.account.email);
                 $user.setUserPassword('');
-                $user.userLogIn();
-                
-                var box = await Hive.openBox('userInfo');
-                box.put('snsType', 'naver');
-                box.put('userEmail', result.account.email);
-                box.put('password', '');
-                box.put('snsId', result.account.id);
-                box.put('appType', $user.appType);
-                box.put('pushKey', '');
-                box.put('deviceInfo', $user.deviceInfo);
-                box.put('options', 'push');
-                box.put('accessToken', $user.accessToken);
-                var box2 = Hive.box('userInfo');
-                print('userInfo in Hive: $box2');
-                await box.close();
 
-                Timer(Duration(seconds: 1), () async{
-                  if($user.accessToken == null || $user.accessToken == '') {
-                  }
-                  else{
-                    $user.login();
+                $user.signUp();
+
+                Timer(Duration(milliseconds: 5), () async{
+                  if($user.signUpMes) {
+                    $user.userLogIn();
+
+                    Timer(Duration(milliseconds: 5), () async{
+                      if ($user.signUpMes) {
+                        $user.userLogIn();
+                        print('3');
+                        var box = await Hive.openBox('userInfo');
+                        box.put('snsType', 'naver');
+                        box.put('userEmail', result.account.email);
+                        box.put('password', '');
+                        box.put('snsId', result.account.id);
+                        box.put('appType', $user.appType);
+                        box.put('pushKey', '');
+                        box.put('deviceInfo', $user.deviceInfo);
+                        box.put('options', 'push');
+                        box.put('accessToken', $user.accessToken);
+                        var box2 = Hive.box('userInfo');
+                        print('userInfo in Hive: $box2');
+                        await box.close();
+
+                        if($user.accessToken == '') {
+                        }
+                        else{
+                          $user.login();
+                          Navigator.pushReplacement(context,
+                              MaterialPageRoute(builder: (context) => setHeightPage()));
+                        }
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) =>
+                            new CupertinoAlertDialog(
+                              content: new Text($user.signStr,style: TextStyle(fontSize:16)),
+                              actions: <Widget>[
+                                CupertinoDialogAction(
+                                  onPressed: () {
+                                    Navigator.pop(context, 'Cheesecake');
+                                  },
+                                  isDefaultAction: true,
+                                  child: Text("닫기",style: TextStyle(fontSize:12),),
+                                )
+                              ],
+                            )
+                        );
+                      }
+                    });
+                  } else {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) =>
+                        new CupertinoAlertDialog(
+                          content: new Text($user.signStr,style: TextStyle(fontSize:16)),
+                          actions: <Widget>[
+                            CupertinoDialogAction(
+                              onPressed: () {
+                                Navigator.pop(context, 'Cheesecake');
+                              },
+                              isDefaultAction: true,
+                              child: Text("닫기",style: TextStyle(fontSize:12),),
+                            )
+                          ],
+                        )
+                    );
                   }
                 });
               }
@@ -291,7 +321,7 @@ class _InitPageState extends State<InitPage> {
                     context: context,
                     builder: (BuildContext context) =>
                     new CupertinoAlertDialog(
-                      content: new Text("이미 가입된 계정입니다.",style: TextStyle(fontSize:16)),
+                      content: new Text("같은 이메일로 가입된 계정입니다.",style: TextStyle(fontSize:16)),
                       actions: <Widget>[
                         CupertinoDialogAction(
                           onPressed: () {
@@ -304,8 +334,6 @@ class _InitPageState extends State<InitPage> {
                     )
                 );
               }else {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => setHeightPage()));
                 UserState $user = Provider.of<UserState>(context, listen: false);
                 $user.setUserSNSType('kakao');
                 if(Platform.isAndroid ){
@@ -316,27 +344,75 @@ class _InitPageState extends State<InitPage> {
                 $user.setUserSNSId(result.account.userID);
                 $user.setUserEmail(result.account.userEmail);
                 $user.setUserPassword('');
-                $user.userLogIn();
 
-                var box = await Hive.openBox('userInfo');
-                box.put('snsType', 'naver');
-                box.put('userEmail', result.account.userEmail);
-                box.put('password', '');
-                box.put('snsId', result.account.userID);
-                box.put('appType', $user.appType);
-                box.put('pushKey', '');
-                box.put('deviceInfo', $user.deviceInfo);
-                box.put('options', 'push');
-                box.put('accessToken', $user.accessToken);
-                var box2 = Hive.box('userInfo');
-                print('userInfo in Hive: $box2');
-                await box.close();
+                $user.signUp();
 
-                Timer(Duration(seconds: 1), () async{
-                  if($user.accessToken == null || $user.accessToken == '') {
+                Timer(Duration(milliseconds: 5), () async{
+                  if($user.signUpMes) {
+                    $user.userLogIn();
+
+                    Timer(Duration(milliseconds: 5), () async{
+                      if ($user.signUpMes) {
+                        $user.userLogIn();
+                        print('3');
+                        var box = await Hive.openBox('userInfo');
+                        box.put('snsType', 'kakao');
+                        box.put('userEmail', result.account.userEmail);
+                        box.put('password', '');
+                        box.put('snsId', result.account.userID);
+                        box.put('appType', $user.appType);
+                        box.put('pushKey', '');
+                        box.put('deviceInfo', $user.deviceInfo);
+                        box.put('options', 'push');
+                        box.put('accessToken', $user.accessToken);
+                        var box2 = Hive.box('userInfo');
+                        print('userInfo in Hive: $box2');
+                        await box.close();
+
+                        if($user.accessToken == '') {
+                        }
+                        else{
+                          $user.login();
+                          Navigator.pushReplacement(context,
+                              MaterialPageRoute(builder: (context) => setHeightPage()));
+                        }
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) =>
+                            new CupertinoAlertDialog(
+                              content: new Text($user.signStr,style: TextStyle(fontSize:16)),
+                              actions: <Widget>[
+                                CupertinoDialogAction(
+                                  onPressed: () {
+                                    Navigator.pop(context, 'Cheesecake');
+                                  },
+                                  isDefaultAction: true,
+                                  child: Text("닫기",style: TextStyle(fontSize:12),),
+                                )
+                              ],
+                            )
+                        );
+                      }
+                    });
                   }
-                  else{
-                    $user.login();
+                  else {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) =>
+                        new CupertinoAlertDialog(
+                          content: new Text($user.signStr,style: TextStyle(fontSize:16)),
+                          actions: <Widget>[
+                            CupertinoDialogAction(
+                              onPressed: () {
+                                Navigator.pop(context, 'Cheesecake');
+                              },
+                              isDefaultAction: true,
+                              child: Text("닫기",style: TextStyle(fontSize:12),),
+                            )
+                          ],
+                        )
+                    );
                   }
                 });
               }
@@ -376,40 +452,101 @@ class _InitPageState extends State<InitPage> {
               switch (result.status) {
                 case AuthorizationStatus.authorized:
                   print("애플로그인성공함: $result");
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => setHeightPage()));
                   UserState $user = Provider.of<UserState>(context, listen: false);
                   $user.setUserSNSType('apple');
                   $user.setUserAppType('ios');
                   $user.setUserSNSId('apple');
                   $user.setUserEmail(result.credential.email);
                   $user.setUserPassword('');
-                  $user.userLogIn();
 
-                  var box = await Hive.openBox('userInfo');
-                  box.put('snsType', 'naver');
-                  box.put('userEmail', result.credential.email);
-                  box.put('password', '');
-                  box.put('snsId', 'apple');
-                  box.put('appType', $user.appType);
-                  box.put('pushKey', '');
-                  box.put('deviceInfo', $user.deviceInfo);
-                  box.put('options', 'push');
-                  box.put('accessToken', $user.accessToken);
-                  var box2 = Hive.box('userInfo');
-                  print('userInfo in Hive: $box2');
-                  await box.close();
+                  $user.signUp();
 
-                  Timer(Duration(seconds: 1), () async{
-                    if($user.accessToken == null || $user.accessToken == '') {
+                  Timer(Duration(milliseconds: 5), () async{
+                    if($user.signUpMes) {
+                      $user.userLogIn();
+
+                      Timer(Duration(milliseconds: 5), () async{
+                        if ($user.signUpMes) {
+                          $user.userLogIn();
+                          print('3');
+                          var box = await Hive.openBox('userInfo');
+                          box.put('snsType', 'naver');
+                          box.put('userEmail', result.credential.email);
+                          box.put('password', '');
+                          box.put('snsId', 'apple');
+                          box.put('appType', $user.appType);
+                          box.put('pushKey', '');
+                          box.put('deviceInfo', $user.deviceInfo);
+                          box.put('options', 'push');
+                          box.put('accessToken', $user.accessToken);
+                          var box2 = Hive.box('userInfo');
+                          print('userInfo in Hive: $box2');
+                          await box.close();
+
+                          if($user.accessToken == '') {
+                          }
+                          else{
+                            $user.login();
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(builder: (context) => setHeightPage()));
+                          }
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) =>
+                              new CupertinoAlertDialog(
+                                content: new Text($user.signStr,style: TextStyle(fontSize:16)),
+                                actions: <Widget>[
+                                  CupertinoDialogAction(
+                                    onPressed: () {
+                                      Navigator.pop(context, 'Cheesecake');
+                                    },
+                                    isDefaultAction: true,
+                                    child: Text("닫기",style: TextStyle(fontSize:12),),
+                                  )
+                                ],
+                              )
+                          );
+                        }
+                      });
                     }
-                    else{
-                      $user.login();
+                    else {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) =>
+                          new CupertinoAlertDialog(
+                            content: new Text($user.signStr,style: TextStyle(fontSize:16)),
+                            actions: <Widget>[
+                              CupertinoDialogAction(
+                                onPressed: () {
+                                  Navigator.pop(context, 'Cheesecake');
+                                },
+                                isDefaultAction: true,
+                                child: Text("닫기",style: TextStyle(fontSize:12),),
+                              )
+                            ],
+                          )
+                      );
                     }
                   });
                   break;
                 case AuthorizationStatus.error:
-                  print("Sign in failed: ${result.error.localizedDescription}");
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) =>
+                      new CupertinoAlertDialog(
+                        content: new Text("애플로그인에 실패했습니다. ios13버전 이하이신 경우 다른 로그인을 선택해주세요.",style: TextStyle(fontSize:16)),
+                        actions: <Widget>[
+                          CupertinoDialogAction(
+                            onPressed: () {
+                              Navigator.pop(context, 'Cheesecake');
+                            },
+                            isDefaultAction: true,
+                            child: Text("닫기",style: TextStyle(fontSize:12),),
+                          )
+                        ],
+                      )
+                  );
                   break;
                 case AuthorizationStatus.cancelled:
                   print('User cancelled');
@@ -463,6 +600,13 @@ class _InitPageState extends State<InitPage> {
         print(_deviceInfo);
       });
     }
+  }
+
+  void goWebview() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) {
+          return webViewPage(url: this._url);
+        }));
   }
 }
 

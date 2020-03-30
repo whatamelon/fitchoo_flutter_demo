@@ -1,6 +1,4 @@
 import 'package:fitchoo/pages/depth/contact.dart';
-import 'package:fitchoo/pages/initial/privacy.dart';
-import 'package:fitchoo/pages/initial/terms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_kakao_login/flutter_kakao_login.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
@@ -99,10 +97,8 @@ class _MyPageState extends State<MyPage> {
                                     Navigator.push(context,MaterialPageRoute(builder: (context) => ContactPage()));
                                     break;
                                   case '2' :
-                                    Navigator.push(context,MaterialPageRoute(builder: (context) => TermsPage()));
                                     break;
                                   case '3' :
-                                    Navigator.push(context,MaterialPageRoute(builder: (context) => PrivacyPage()));
                                     break;
                                   case '4' :
 

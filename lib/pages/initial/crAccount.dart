@@ -176,7 +176,7 @@ class _CrAccountPageState extends State<CrAccountPage> {
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(0, 10, 0 ,5),
-                child: Text('${_observer}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color:Colors.red),),
+                child: Text(this._observer, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color:Colors.red),),
               ),
               Row(
                 children: <Widget>[
@@ -238,7 +238,7 @@ class _CrAccountPageState extends State<CrAccountPage> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5)),
               onPressed: () {
-                setState(() async{
+                setState(() {
                   print('1');
                     final bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(_emailController.text);
                     if(!emailValid) {
@@ -279,8 +279,7 @@ class _CrAccountPageState extends State<CrAccountPage> {
                           box.put('appType', $user.appType);
                           box.put('pushKey', '');
                           box.put('deviceInfo', $user.deviceInfo);
-                          box.put(
-                              'options', check == true ? 'push' : 'default');
+                          box.put('options', check == true ? 'push' : 'default');
                           box.put('accessToken', $user.accessToken);
                           var box2 = Hive.box('userInfo');
                           print('userInfo in Hive: $box2');
@@ -290,7 +289,9 @@ class _CrAccountPageState extends State<CrAccountPage> {
                               MaterialPageRoute(
                                   builder: (context) => setHeightPage()));
                         } else {
-                          this._observer = '회원가입에 실패했습니다.';
+                          setState(() {
+                            this._observer = $user.signStr;
+                          });
                         }
                       });
                     }
