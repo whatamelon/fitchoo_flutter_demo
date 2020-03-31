@@ -406,6 +406,11 @@ class QurateState with ChangeNotifier {
     notifyListeners();
   }
 
+  setUpdatetiem(i) {
+    this._itemupDate = i;
+    notifyListeners();
+  }
+
   setQUsername(i) {
     this._quserName = i;
     notifyListeners();

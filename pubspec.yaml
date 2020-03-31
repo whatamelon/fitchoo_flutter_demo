@@ -40,6 +40,7 @@ dependencies:
   transparent_image: ^1.0.0
   flutter_conditional_rendering: ^1.1.1
   path_provider: 1.6.5
+  jiffy: ^3.0.1
 
 
 dev_dependencies:

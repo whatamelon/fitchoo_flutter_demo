@@ -20,7 +20,7 @@ class _CrAccountPageState extends State<CrAccountPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordController2 = TextEditingController();
   String _observer = '';
-  bool check = false;
+  bool check = true;
 
   @override
   void initState() {
@@ -36,6 +36,7 @@ class _CrAccountPageState extends State<CrAccountPage> {
         appBar: AppBar(
           title: Text('회원가입', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
           centerTitle: true,
+          elevation: 1,
         ),
         body : LayoutBuilder(
             builder: (BuildContext context, BoxConstraints viewportConstraints) {
@@ -51,12 +52,12 @@ class _CrAccountPageState extends State<CrAccountPage> {
                         children: <Widget>[
                           Container(
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(size.width*0.05, 60, 0 ,20),
+                              padding: EdgeInsets.fromLTRB(size.width*0.05, 20, 0 ,20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  Text('이메일만 있으면', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),),
-                                  Text('순식간에 가입 끝!', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),),
+                                  Text('이메일만 있으면', style: TextStyle(fontSize: size.width*0.07, fontWeight: FontWeight.bold),),
+                                  Text('순식간에 가입 끝!', style: TextStyle(fontSize: size.width*0.07, fontWeight: FontWeight.bold),),
                                   Padding(
                                     padding: const EdgeInsets.only(top:10.0),
                                     child: Text('간편하게 가입하고 서비스를 시작해보세요.', style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal, color: Color(0XFF8a8a8a)),),
@@ -95,130 +96,98 @@ class _CrAccountPageState extends State<CrAccountPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                    labelText: "이메일",
-                    labelStyle: TextStyle(
-                        color: Color(0XFF8a8a8a)
-                    ),
-                    hintText: "이메일",
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0XFF8a8a8a)),
-                        borderRadius: BorderRadius.circular(8.0)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0XFF8a8a8a)),
-                        borderRadius: BorderRadius.circular(8.0))
+              SizedBox(
+                height: size.width*0.14,
+                child: TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                      labelText: "이메일",
+                      labelStyle: TextStyle(
+                          color: Color(0XFF8a8a8a)
+                      ),
+                      hintText: "이메일",
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0XFF8a8a8a)),
+                          borderRadius: BorderRadius.circular(8.0)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0XFF8a8a8a)),
+                          borderRadius: BorderRadius.circular(8.0))
+                  ),
+                  validator: (String value) {
+                    if (value.isEmpty) {
+                      return "이메일을 적어주세요.";
+                    } else {
+                      return null;
+                    }
+                  },
                 ),
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return "이메일을 적어주세요.";
-                  } else {
-                    return null;
-                  }
-                },
               ),
               Padding(
-                  padding: EdgeInsets.only(top:20)
+                  padding: EdgeInsets.only(top:size.height*0.05)
               ),
-              TextFormField(
-                obscureText: true,
-                controller: _passwordController,
-                decoration: InputDecoration(
-                    labelText: "비밀번호(8~20자리)",
-                    labelStyle: TextStyle(
-                        color: Color(0XFF8a8a8a)
-                    ),
-                    hintText: "비밀번호(8~20자리)",
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0XFF8a8a8a)),
-                        borderRadius: BorderRadius.circular(8.0)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0XFF8a8a8a)),
-                        borderRadius: BorderRadius.circular(8.0))
+              SizedBox(
+                height: size.width*0.14,
+                child: TextFormField(
+                  obscureText: true,
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                      labelText: "비밀번호(8~20자리)",
+                      labelStyle: TextStyle(
+                          color: Color(0XFF8a8a8a)
+                      ),
+                      hintText: "비밀번호(8~20자리)",
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0XFF8a8a8a)),
+                          borderRadius: BorderRadius.circular(8.0)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0XFF8a8a8a)),
+                          borderRadius: BorderRadius.circular(8.0))
+                  ),
+                  validator: (String value) {
+                    if (value.isEmpty) {
+                      return "비밀번호를 적어주세요.";
+                    } else {
+                      return null;
+                    }
+                  },
                 ),
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return "비밀번호를 적어주세요.";
-                  } else {
-                    return null;
-                  }
-                },
               ),
               Padding(
-                  padding: EdgeInsets.only(top:20)
+                  padding: EdgeInsets.only(top:size.height*0.04)
               ),
-              TextFormField(
-                obscureText: true,
-                controller: _passwordController2,
-                decoration: InputDecoration(
-                    labelText: "비밀번호 확인",
-                    labelStyle: TextStyle(
-                        color: Color(0XFF8a8a8a)
-                    ),
-                    hintText: "비밀번호 확인",
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0XFF8a8a8a)),
-                        borderRadius: BorderRadius.circular(8.0)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0XFF8a8a8a)),
-                        borderRadius: BorderRadius.circular(8.0))
+              SizedBox(
+                height:size.width*0.14,
+                child: TextFormField(
+                  obscureText: true,
+                  controller: _passwordController2,
+                  decoration: InputDecoration(
+                      labelText: "비밀번호 확인",
+                      labelStyle: TextStyle(
+                          color: Color(0XFF8a8a8a)
+                      ),
+                      hintText: "비밀번호 확인",
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0XFF8a8a8a)),
+                          borderRadius: BorderRadius.circular(8.0)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0XFF8a8a8a)),
+                          borderRadius: BorderRadius.circular(8.0))
+                  ),
+                  validator: (String value) {
+                    if (value.isEmpty) {
+                      return "비밀번호를 적어주세요.";
+                    } else if(_passwordController != _passwordController2) {
+                      return "비밀번호가 일치하지 않습니다.";
+                    } else {
+                      return null;
+                    }
+                  },
                 ),
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return "비밀번호를 적어주세요.";
-                  } else if(_passwordController != _passwordController2) {
-                    return "비밀번호가 일치하지 않습니다.";
-                  } else {
-                    return null;
-                  }
-                },
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(0, 10, 0 ,5),
                 child: Text(this._observer, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color:Colors.red),),
-              ),
-              Row(
-                children: <Widget>[
-                  ClipRRect(
-                    clipBehavior: Clip.hardEdge,
-                    borderRadius: BorderRadius.all(Radius.circular(50)),
-                    child: SizedBox(
-                      width:Checkbox.width*1.5,
-                      height:Checkbox.width*1.5,
-                      child: Container(
-                        decoration: new BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                          ),
-                          borderRadius: new BorderRadius.circular(50),
-                        ),
-                        child: Theme(
-                          data:ThemeData(
-                            unselectedWidgetColor: Colors.transparent,
-                          ),
-                          child: Transform.scale(
-                            scale:1.5,
-                            child: Checkbox(
-                              activeColor: new Color(0XFFec3e39),
-                              checkColor: Colors.white,
-                              value: check,
-                              onChanged: (bool newValue) {
-                                setState(() {
-                                  check = newValue;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left:5),
-                    child: Text("자동로그인", style: TextStyle(fontSize: 16)),
-                  ),
-                ],
               ),
             ],
           ),

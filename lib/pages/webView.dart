@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class webViewPage extends StatefulWidget {
-  final String url;
+  final List viewData;
 
-  webViewPage({Key key, this.url}) : super(key: key);
+  webViewPage({Key key, this.viewData}) : super(key: key);
   @override
   _webViewPageState createState() => _webViewPageState();
 }
@@ -19,6 +19,21 @@ class _webViewPageState extends State<webViewPage> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+//        centerTitle: true,
+//        title: Text(widget.viewData[0], style: TextStyle(fontSize: 24,),),
+        actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: IconButton(
+                icon: Icon(Icons.close), iconSize: 30, onPressed: () {
+              Navigator.pop(context);
+            }),
+          ),
+        ],
+      ),
         body:Align(
           alignment: Alignment.topLeft,
           child: SafeArea(
@@ -30,7 +45,7 @@ class _webViewPageState extends State<webViewPage> {
             child: WebView(
               javascriptMode: JavascriptMode.unrestricted,
                                       key: _key,
-                                      initialUrl: widget.url,
+                                      initialUrl: widget.viewData[1],
 //                                      javascriptChannels: Set.from([
 //                                        JavascriptChannel(
 //                                            name: 'setHeight',
@@ -41,11 +56,11 @@ class _webViewPageState extends State<webViewPage> {
 //                                            })
 //                                      ]),
                                       onWebViewCreated: (WebViewController webViewController) async{
-                                        print("start  :   ${widget.url}");
+                                        print("start  :   ${widget.viewData[1]}");
                                         _webViewController = webViewController;
                                       },
                                       onPageFinished:(String url) async{
-                                        print("finish   :  ${widget.url}");
+                                        print("finish   :  ${widget.viewData[1]}");
 //                                        UserState $user = Provider.of<UserState>(context, listen: false);
 //                                        final res1 =  _webViewController.loadUrl('javascript:callbackAppType(\'android3\')');
 //                                        final res2 =  _webViewController.loadUrl('javascript:callbackAuthToken(\'${$user.accessToken}\')');

@@ -7,6 +7,7 @@ import 'package:fitchoo/states/user_state.dart';
 import 'package:fitchoo/states/item_state.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_conditional_rendering/conditional_switch.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -211,22 +212,20 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                   fit: BoxFit.fitWidth,
                                 ),
                                 Positioned(
-                                  top: 5,
-                                  right: 5,
-                                  child: Transform.rotate(
-                                    angle: 45 * pi / 180,
-                                    child: Opacity(
-                                      opacity: 0.7,
-                                      child: Material(
-                                        color: Colors.transparent,
+                                  top: 10,
+                                  left: 10,
+                                  child: ClipOval(
+                                    child: Container(
+                                      width: 35,
+                                      height:35,
+                                      color: Colors.white,
                                         child: IconButton(
-                                            icon: Icon(
-                                              Icons.add_circle,
-                                              color: Colors.black,
-                                              size: 35,
-                                            ),
-                                            onPressed: () => beforeRouteOut(),
-                                            ),
+                                          icon: Icon(
+                                            Icons.arrow_back_ios,
+                                            color: Colors.black,
+                                            size: 20,
+                                          ),
+                                        onPressed: () => beforeRouteOut(),
                                       ),
                                     ),
                                   ),
@@ -285,7 +284,7 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                     Align(
                                         alignment: Alignment.bottomRight,
                                         child: Text(
-                                          '상품업데이트 4시간전',
+                                          '상품 업데이트 ${timeModi($qurate.itemupDate)}',
                                           style: TextStyle(
                                               fontSize: 13,
                                               color: Colors.black26),
@@ -1079,6 +1078,30 @@ class _QurationIdPageState extends State<QurationIdPage> {
           break;
       }
     });
+  }
+
+  String timeModi(t) {
+    var test = Jiffy(t).fromNow();
+    if(test.contains('day')) {
+      if(test.contains('days')) {
+        return '${test.substring(0,2)}일전';
+      } else {
+        return '1 일전';
+      }
+    } else if(test.contains('hour')) {
+      if(test.contains('hours')) {
+        return '${test.substring(0,2)}시간전';
+      } else {
+        return '1 시간전';
+      }
+    } else if(test.contains('minute')) {
+      if(test.contains('minutes')) {
+        return '${test.substring(0,2)}분전';
+      } else {
+        return '1 분전';
+      }
+    }
+    return test;
   }
 
   _secCatSelect(i, $item, StateSetter updateState) {

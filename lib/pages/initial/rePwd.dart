@@ -28,7 +28,7 @@ class _RePwdPageState extends State<RePwdPage> {
             _submit ?
             Center(
               child: Padding(
-                padding: const EdgeInsets.only(top:80.0),
+                padding: const EdgeInsets.only(top:20.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -47,7 +47,7 @@ class _RePwdPageState extends State<RePwdPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: 80),
+                  padding: EdgeInsets.only(top: 20),
                 ),
                 Container(
                   child: Padding(
@@ -83,7 +83,7 @@ class _RePwdPageState extends State<RePwdPage> {
        padding: EdgeInsets.fromLTRB(size.width*0.05, 0, size.width*0.05 ,20),
        child: Container(
            width: size.width*1,
-           height: size.width*0.15,
+           height: size.width*0.14,
            child: RaisedButton(
              child:
              _submit ?
@@ -128,24 +128,27 @@ class _RePwdPageState extends State<RePwdPage> {
          child: Column(
            crossAxisAlignment: CrossAxisAlignment.start,
            children: <Widget>[
-             TextFormField(
-               controller: _rePwdController,
-               decoration: InputDecoration(
-                 hintText: "이메일",
-                 border: OutlineInputBorder(
-                     borderSide: BorderSide(color: Color(0XFF8a8a8a)),
-                     borderRadius: BorderRadius.circular(8.0)),
-                 focusedBorder: OutlineInputBorder(
-                     borderSide: BorderSide(color: Color(0XFF8a8a8a)),
-                     borderRadius: BorderRadius.circular(8.0))
+             SizedBox(
+               height: size.width*0.14,
+               child: TextFormField(
+                 controller: _rePwdController,
+                 decoration: InputDecoration(
+                   hintText: "이메일",
+                   border: OutlineInputBorder(
+                       borderSide: BorderSide(color: Color(0XFF8a8a8a)),
+                       borderRadius: BorderRadius.circular(8.0)),
+                   focusedBorder: OutlineInputBorder(
+                       borderSide: BorderSide(color: Color(0XFF8a8a8a)),
+                       borderRadius: BorderRadius.circular(8.0))
+                 ),
+                 validator: (String value) {
+                   if (value.isEmpty) {
+                     return "이메일을 적어주세요.";
+                   } else {
+                     return null;
+                   }
+                 },
                ),
-               validator: (String value) {
-                 if (value.isEmpty) {
-                   return "이메일을 적어주세요.";
-                 } else {
-                   return null;
-                 }
-               },
              ),
            ],
          ),

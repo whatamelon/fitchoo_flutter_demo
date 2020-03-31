@@ -24,7 +24,7 @@ class InitPage extends StatefulWidget {
 class _InitPageState extends State<InitPage> {
   List _deviceInfo = <dynamic>[];
   static final DeviceInfoPlugin plugin = DeviceInfoPlugin();
-  String _url = '';
+  List<String> _viewData = ['', ''];
 
   @override
   void initState() {
@@ -42,11 +42,11 @@ class _InitPageState extends State<InitPage> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: _rootBody(size, context, _url)
+      body: _rootBody(size, context)
     );
   }
 
-  Widget _rootBody(Size size, BuildContext context, url) {
+  Widget _rootBody(Size size, BuildContext context) {
     return Stack(
       children: <Widget> [
         Positioned.fill(
@@ -82,10 +82,10 @@ class _InitPageState extends State<InitPage> {
                             color: Colors.white
                         )
                     ),
-                    Padding(padding: EdgeInsets.all(18)),
+                    Padding(padding: EdgeInsets.all(15)),
                     Text("또는", style: TextStyle(
                         fontSize: 15, fontWeight: FontWeight.w700, color:Colors.white)),
-                    Padding(padding: EdgeInsets.all(18)),
+                    Padding(padding: EdgeInsets.all(15)),
                     Expanded(
                         child: Divider(
                             color: Colors.white
@@ -109,7 +109,8 @@ class _InitPageState extends State<InitPage> {
                         InkWell(
                           onTap:() {
                             setState(() {
-                              this._url = 'https://fitchoo.kr/privacy.html';
+                              this._viewData[0] = '개인정보 처리방침';
+                              this._viewData[1] = 'https://fitchoo.kr/privacy.html';
                               goWebview();
                             });
                           },
@@ -119,7 +120,8 @@ class _InitPageState extends State<InitPage> {
                         InkWell(
                           onTap:() {
                             setState(() {
-                              this._url = 'https://fitchoo.kr/terms.html';
+                              this._viewData[0] = '이용약관';
+                              this._viewData[1] = 'https://fitchoo.kr/terms.html';
                               goWebview();
                             });
                           },
@@ -142,7 +144,7 @@ class _InitPageState extends State<InitPage> {
   Widget _redButton(Size size, BuildContext context) {
     return SizedBox(
         width: size.width * 0.9,
-        height: 60,
+        height: size.height * 0.07,
         child: FlatButton(
           child: new Row(
               children: <Widget>[
@@ -171,7 +173,7 @@ class _InitPageState extends State<InitPage> {
   Widget _greenButton(Size size) {
     return SizedBox(
         width: size.width * 0.9,
-        height: 60,
+        height: size.height * 0.07,
         child: FlatButton(
           child: new Row(
               children: <Widget>[
@@ -299,7 +301,7 @@ class _InitPageState extends State<InitPage> {
   Widget _yellowButton(Size size) {
     return SizedBox(
         width: size.width * 0.9,
-        height: 60,
+        height: size.height * 0.07,
         child: FlatButton(
           child: new Row(
               children: <Widget>[
@@ -425,7 +427,7 @@ class _InitPageState extends State<InitPage> {
   Widget _appleButton(Size size) {
     return SizedBox(
         width: size.width * 0.9,
-        height: 60,
+        height: size.height * 0.07,
         child: FlatButton(
           child: new Row(
               children: <Widget>[
@@ -605,7 +607,7 @@ class _InitPageState extends State<InitPage> {
   void goWebview() {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (BuildContext context) {
-          return webViewPage(url: this._url);
+          return webViewPage(viewData: this._viewData);
         }));
   }
 }
