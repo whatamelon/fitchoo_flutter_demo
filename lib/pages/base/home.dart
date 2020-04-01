@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:fitchoo/pages/depth/quration_id.dart';
 import 'package:fitchoo/states/qurate_state.dart';
 import 'package:fitchoo/states/user_state.dart';
@@ -14,22 +13,6 @@ import 'package:transparent_image/transparent_image.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
-//class Newmap {
-//  String rqitemId;
-//  String rqcode;
-//  String rclickCnt;
-//  String rquserName;
-//  String rimgFaceFile;
-//  String rimgItemFile;
-//  String ritemupDate;
-//  String rtitle;
-//  String rbody;
-//
-//  Newmap({this.rqitemId, this.rqcode,
-//    this.rclickCnt, this.rquserName,
-//    this.rimgFaceFile, this.rimgItemFile,
-//    this.ritemupDate, this.rtitle, this.rbody});
-//}
 
 class HomePage extends StatefulWidget {
   @override
@@ -39,12 +22,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = new ScrollController();
   Map<String, String> newMap = {};
-  List _recentList = [];
 
   @override
   void initState() {
     super.initState();
-    _openBox();
     UserState $user = Provider.of<UserState>(context, listen: false);
     QurateState $qurate = Provider.of<QurateState>(context, listen: false);
     ItemState $item = Provider.of<ItemState>(context, listen: false);
@@ -55,13 +36,6 @@ class _HomePageState extends State<HomePage> {
         $qurate.getQurateList($user.accessToken);
       } else {}
     });
-  }
-
-  Future _openBox() async{
-    final prefs = await SharedPreferences.getInstance();
-
-    _recentList = prefs.getStringList('recentList');
-    return _recentList;
   }
 
   @override
@@ -111,7 +85,7 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 20, 0, 0),
                 child: Text(
-                  '새로운 큐레이션',
+                  '오늘의 큐레이션',
                   style: TextStyle(fontSize: 20),
                 ),
               ),
@@ -145,30 +119,36 @@ class _HomePageState extends State<HomePage> {
                               onTap: () async {
                                 $qurate.switchHero('i');
 
-//                                listToMap($qurate, $qurate.qitemList[index]);
-//                                final pref = await SharedPreferences.getInstance();
-//                                var recentList =  pref.getStringList('recentList');
-//                                if(recentList == null) {
-//                                  pref.setStringList('recentList', []);
-//                                }
-//
-//                                bool _isIncluded = false;
-//                                for(var i in recentList) {
-//                                  if(i.contains($qurate.qitemList[index].iqitemId)) {
-//                                    _isIncluded = true;
-//                                    break;
-//                                  }
-//                                }
-//
-//                                if(!_isIncluded) {
-//                                  if(recentList.length == 10) {
-//                                    recentList.removeLast();
-//                                  }
-//                                  else {
-//                                    recentList.removeWhere((newMap) => newMap[0] == $qurate.qitemList[index].iqitemId);
-//                                  }
-//                                  recentList.insert(0, jsonEncode(newMap));
-//                                }
+                                listToMap($qurate, $qurate.qitemList[index]);
+                                final pref = await SharedPreferences.getInstance();
+                                var recentList =  pref.getStringList('recentList');
+                                if(recentList == null) {
+                                  pref.setStringList('recentList', []);
+                                }
+
+                                bool _isIncluded = false;
+                                for(var i in recentList) {
+                                  if(i.contains($qurate.qitemList[index].iqitemId)) {
+                                    _isIncluded = true;
+                                    break;
+                                  }
+                                }
+
+                                if(!_isIncluded) {
+                                  if(recentList.length == 10) {
+                                    recentList.removeLast();
+                                  }
+                                  else {
+                                    recentList.removeWhere((newMap) => newMap[0] == $qurate.qitemList[index].iqitemId);
+                                  }
+                                  print('newMap____$newMap');
+                                  print('newMapEncode____${jsonEncode(newMap)}');
+                                  recentList.insert(0, jsonEncode(newMap));
+                                }
+
+                                print(recentList);
+
+                                pref.setStringList('recentList', recentList);
 
                                 $qurate.setQItemid($qurate.qitemList[index].iqitemId);
                                 $qurate.setImgItemFile($qurate.qitemList[index].iimgItemFile);
@@ -177,6 +157,7 @@ class _HomePageState extends State<HomePage> {
                                 $qurate.setQTitle($qurate.qitemList[index].ititle);
                                 $qurate.setQBody($qurate.qitemList[index].ibody);
                                 $qurate.setUpdatetiem($qurate.qitemList[index].iitemupDate);
+                                $qurate.setClickCnt($qurate.qitemList[index].iclickCnt);
                                 await $qurate.getQurateInfo($user.accessToken);
                                 $item.setQid($qurate.qitemList[index].iqitemId);
                                 await $item.getItemList($user.accessToken, $user.userHeight);
@@ -220,6 +201,7 @@ class _HomePageState extends State<HomePage> {
             $qurate.setQTitle($qurate.qnewList[index].ntitle);
             $qurate.setQBody($qurate.qnewList[index].nbody);
             $qurate.setUpdatetiem($qurate.qnewList[index].nitemupDate);
+            $qurate.setClickCnt($qurate.qnewList[index].nclickCnt);
             await $qurate.getQurateInfo($user.accessToken);
             $item.setQid($qurate.qnewList[index].nqitemId);
             await $item.getItemList($user.accessToken, $user.userHeight);
@@ -390,109 +372,48 @@ class _HomePageState extends State<HomePage> {
     return test;
   }
 
-//  void listToMap($qurate, x) {
-//    if ($qurate.qSwitchHero == 'i') {
-//      newMap['rqitemId'] = x.iqitemId;
-//      newMap['rqcode'] = x.iqcode;
-//      newMap['rclickCnt'] = x.iclickCnt;
-//      newMap['rquserName'] = x.iquserName;
-//      newMap['rimgFaceFile'] = x.iimgFaceFile;
-//      newMap['rimgItemFile'] = x.iimgItemFile;
-//      newMap['ritemupDate'] = x.iitemupDate;
-//      newMap['rtitle'] = x.ititle;
-//      newMap['rbody'] = x.ibody;
-//    } else if ($qurate.qSwitchHero == 'p') {
-//      newMap['rqitemId'] = x.pqitemId;
-//      newMap['rqcode'] = x.pqcode;
-//      newMap['rclickCnt'] = x.pclickCnt;
-//      newMap['rquserName'] = x.pquserName;
-//      newMap['rimgFaceFile'] = x.pimgFaceFile;
-//      newMap['rimgItemFile'] = x.pimgItemFile;
-//      newMap['ritemupDate'] = x.pitemupDate;
-//      newMap['rtitle'] = x.ptitle;
-//      newMap['rbody'] = x.pbody;
-//    } else if ($qurate.qSwitchHero == 'n') {
-//      newMap['rqitemId'] = x.nqitemId;
-//      newMap['rqcode'] = x.nqcode;
-//      newMap['rclickCnt'] = x.nclickCnt;
-//      newMap['rquserName'] = x.nquserName;
-//      newMap['rimgFaceFile'] = x.nimgFaceFile;
-//      newMap['rimgItemFile'] = x.nimgItemFile;
-//      newMap['ritemupDate'] = x.nitemupDate;
-//      newMap['rtitle'] = x.ntitle;
-//      newMap['rbody'] = x.nbody;
-//    } else {
-//      newMap['rqitemId'] = x['rqitemId'];
-//      newMap['rqcode'] = x['rqcode'];
-//      newMap['rclickCnt'] = x['rclickCnt'];
-//      newMap['rquserName'] = x['rquserName'];
-//      newMap['rimgFaceFile'] = x['rimgFaceFile'];
-//      newMap['rimgItemFile'] = x['rimgItemFile'];
-//      newMap['ritemupDate'] = x['ritemupDate'];
-//      newMap['rtitle'] = x['rtitle'];
-//      newMap['rbody'] = x['rbody'];
-//    }
-//  }
+  void listToMap($qurate, x) {
+    if ($qurate.qSwitchHero == 'i') {
+      newMap['rqitemId'] = x.iqitemId;
+      newMap['rqcode'] = x.iqcode;
+      newMap['rclickCnt'] = x.iclickCnt;
+      newMap['rquserName'] = x.iquserName;
+      newMap['rimgFaceFile'] = x.iimgFaceFile;
+      newMap['rimgItemFile'] = x.iimgItemFile;
+      newMap['ritemupDate'] = x.iitemupDate;
+      newMap['rtitle'] = x.ititle;
+      newMap['rbody'] = x.ibody;
+    } else if ($qurate.qSwitchHero == 'p') {
+      newMap['rqitemId'] = x.pqitemId;
+      newMap['rqcode'] = x.pqcode;
+      newMap['rclickCnt'] = x.pclickCnt;
+      newMap['rquserName'] = x.pquserName;
+      newMap['rimgFaceFile'] = x.pimgFaceFile;
+      newMap['rimgItemFile'] = x.pimgItemFile;
+      newMap['ritemupDate'] = x.pitemupDate;
+      newMap['rtitle'] = x.ptitle;
+      newMap['rbody'] = x.pbody;
+    } else if ($qurate.qSwitchHero == 'n') {
+      newMap['rqitemId'] = x.nqitemId;
+      newMap['rqcode'] = x.nqcode;
+      newMap['rclickCnt'] = x.nclickCnt;
+      newMap['rquserName'] = x.nquserName;
+      newMap['rimgFaceFile'] = x.nimgFaceFile;
+      newMap['rimgItemFile'] = x.nimgItemFile;
+      newMap['ritemupDate'] = x.nitemupDate;
+      newMap['rtitle'] = x.ntitle;
+      newMap['rbody'] = x.nbody;
+    } else {
+      newMap['rqitemId'] = x['rqitemId'];
+      newMap['rqcode'] = x['rqcode'];
+      newMap['rclickCnt'] = x['rclickCnt'];
+      newMap['rquserName'] = x['rquserName'];
+      newMap['rimgFaceFile'] = x['rimgFaceFile'];
+      newMap['rimgItemFile'] = x['rimgItemFile'];
+      newMap['ritemupDate'] = x['ritemupDate'];
+      newMap['rtitle'] = x['rtitle'];
+      newMap['rbody'] = x['rbody'];
+    }
+  }
 
-//  Widget _buildRecentCards($qurate, img_url, int index, $user, $item, box) {
-//    return Hero(
-//      tag:'r${box[index]['rimgItemFile']}',
-//      child: Material(
-//          color: Colors.transparent,
-//          child: InkWell(
-//            splashColor: Colors.white,
-//            onTap: () async{
-//              $qurate.switchHero('r');
-//
-//              print(box[index]);
-//              listToMap($qurate, box[index]);
-//              var qbox = await Hive.openBox('qurateInfo');
-//              var getBox = qbox.get('recentList');
-//              getBox.insert(0, newMap);
-//              print('qinfo in Hive: ${qbox.get('recentList')}');
-//              await qbox.close();
-//
-//              $qurate.setQItemid(box[index]['rqitemId']);
-//              $qurate.setImgItemFile(box[index]['rimgItemFile']);
-//              $qurate.setImgFaceFile(box[index]['rimgFaceFile']);
-//              $qurate.setQUsername(box[index]['rquserName']);
-//              $qurate.setQTitle(box[index]['rtitle']);
-//              $qurate.setQBody(box[index]['rbody']);
-//              await $qurate.getQurateInfo($user.accessToken);
-//              $item.setQid(box[index]['rqitemId']);
-//              await $item.getItemList($user.accessToken, $user.userHeight);
-//              Navigator.of(context).push(MaterialPageRoute(
-//                  builder: (BuildContext context) => QurationIdPage()));
-//            },
-//            child: Container(
-//              margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
-//              child: Card(
-//                child: Column(
-//                  crossAxisAlignment: CrossAxisAlignment.stretch,
-//                  children: <Widget>[
-//                    ClipRRect(
-//                        borderRadius: BorderRadius.circular(8),
-//                        child: FadeInImage.memoryNetwork(
-//                            fit: BoxFit.cover,
-//                            width: 170,
-//                            height: 130,
-//                            placeholder: kTransparentImage,
-//                            image:
-//                            '$img_url${box[index]['rimgItemFile']}')),
-//                    Padding(
-//                      padding: EdgeInsets.only(top: 8),
-//                    ),
-//                    Text(
-//                      '${box[index]['rtitle']}',
-//                      style: TextStyle(fontSize: 12),
-//                    ),
-//                  ],
-//                ),
-//                elevation: 0,
-//              ),
-//            ),
-//          ),
-//        ),
-//    );
-//  }
 }

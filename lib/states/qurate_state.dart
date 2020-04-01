@@ -314,6 +314,8 @@ class QurateState with ChangeNotifier {
         var les = response.data['result']['qpopList'];
         list = les.map<QpopList>((json) => QpopList.fromJson(json)).toList();
         this._qpopList = list;
+        print('les____$les');
+        print('qpopList____${this._qpopList}');
 
         var les2 = response.data['result']['qnewList'];
         list2 = les2.map<QnewList>((json) => QnewList.fromJson(json)).toList();
@@ -408,6 +410,11 @@ class QurateState with ChangeNotifier {
 
   setUpdatetiem(i) {
     this._itemupDate = i;
+    notifyListeners();
+  }
+
+  setClickCnt(i) {
+    this._clickCnt = i;
     notifyListeners();
   }
 
