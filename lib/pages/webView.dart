@@ -21,27 +21,31 @@ class _webViewPageState extends State<webViewPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        elevation: 0,
+        elevation: 1,
 //        centerTitle: true,
 //        title: Text(widget.viewData[0], style: TextStyle(fontSize: 24,),),
         actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: IconButton(
-                icon: Icon(Icons.close), iconSize: 30, onPressed: () {
+          InkWell(
+            onTap: () {
               Navigator.pop(context);
-            }),
+            },
+            child: Container(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Icon(Icons.close, size: 30,)
+              ),
+            ),
           ),
         ],
       ),
         body:Align(
-          alignment: Alignment.topLeft,
+          alignment: Alignment.center,
           child: SafeArea(
             left:true,
             top:true,
             right:true,
             bottom: true,
-            minimum: const EdgeInsets.only(top:10),
+//            minimum: const EdgeInsets.only(top:10),
             child: WebView(
               javascriptMode: JavascriptMode.unrestricted,
                                       key: _key,

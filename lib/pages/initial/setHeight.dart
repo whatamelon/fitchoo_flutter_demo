@@ -6,8 +6,7 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:fitchoo/states/user_state.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class setHeightPage extends StatefulWidget {
   @override
@@ -19,7 +18,6 @@ class _setHeightPageState extends State<setHeightPage> {
 
   void initState() {
     super.initState();
-    Hive.initFlutter();
     _heightController = TextEditingController();
   }
 
@@ -104,11 +102,13 @@ class _setHeightPageState extends State<setHeightPage> {
            shape: RoundedRectangleBorder(
                borderRadius: BorderRadius.circular(5)),
            onPressed: () async{
-             var box = await Hive.openBox('userInfo');
-             box.put('userHeight', _heightController.text);
-             var box2 = Hive.box('userInfo');
-             print('userInfo in Hive: $box2');
-             await box.close();
+             final pref = await SharedPreferences.getInstance();
+             var loginInfo =  pref.getStringList('userLoginInfo');
+             print(loginInfo);
+             loginInfo.insert(5,_heightController.text);
+             pref.setStringList('userLoginInfo', loginInfo);
+             print(loginInfo);
+
              UserState $user = Provider.of<UserState>(context, listen: false);
              $user.setUserHeight(_heightController.text);
              Navigator.pushReplacement(context,

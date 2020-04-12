@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fitchoo/pages/shopView.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:async';
@@ -9,8 +14,57 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_conditional_rendering/conditional_switch.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
 
+class RItemList {
+  String ritemId = '';
+  String risHeart = '';
+  String rcat1 = '';
+  String rcat2 = '';
+  String risNew = '';
+  String rname = '';
+  String rprice = '';
+  String rlinkUrl = '';
+  String rimgFile = '';
+  String rinfo = '';
+  String rshopId = '';
+  String rheight = '';
+  String rmodelId = '';
+
+  RItemList(
+      {this.ritemId,
+        this.risHeart,
+        this.rcat1,
+        this.rcat2,
+        this.risNew,
+        this.rname,
+        this.rprice,
+        this.rlinkUrl,
+        this.rimgFile,
+        this.rinfo,
+        this.rshopId,
+        this.rheight,
+        this.rmodelId});
+
+  factory RItemList.fromJson(Map<String, dynamic> json) {
+    return RItemList(
+      ritemId: json["itemId"],
+      risHeart: json["isHeart"],
+      rcat1: json["cat1"],
+      rcat2: json["cat2"],
+      risNew: json["isNew"],
+      rname: json["name"],
+      rprice: json["price"],
+      rlinkUrl: json["linkUrl"],
+      rimgFile: json["imgFile"],
+      rinfo: json["info"],
+      rshopId: json["shopId"],
+      rheight: json["height"],
+      rmodelId: json["modelId"],
+    );
+  }
+}
 
 class QurationItemPage extends StatefulWidget {
   @override
@@ -18,6 +72,8 @@ class QurationItemPage extends StatefulWidget {
 }
 
 class _QurationItemPageState extends State<QurationItemPage> {
+  Map<String, String> newMap = {};
+  List<String> _viewData = ['','',''];
   final ScrollController _qiscrollController = new ScrollController();
   final fkey = new GlobalKey();
   bool _isLoad = false;
@@ -161,18 +217,15 @@ class _QurationItemPageState extends State<QurationItemPage> {
           this._noMoreItem = '상품이 더 이상 없습니다.';
         } else {
           this._isLoad = true;
-          print('ㅇㅋ1');
           Timer(Duration(seconds: 3), () async{
             setState(() {
-              print('ㅇㅋ2r');
               this._isLoad = false;
             });
           });
           $item.setOffset($item.offset + 10);
-          $item.getItemList($user.accessToken, $user.userHeight);
+          $item.getQItemList($user.accessToken, $user.userHeight, $qurate.qcontId, $user.appInfo);
         }
       } else {
-        print('ㅇㅋ3');
         this._isLoad = false;
       }
     });
@@ -184,7 +237,7 @@ class _QurationItemPageState extends State<QurationItemPage> {
     _tempFirstCat = {'code': '000', 'name': '전체'};
     _tempSecCat = {'code': '000', 'name': '전체'};
 
-    $qurate.qitemId == '3' ? _filterIndex = '1' : _filterIndex = '0';
+    $qurate.qcontId == '3' ? _filterIndex = '1' : _filterIndex = '0';
   }
 
   @override
@@ -203,7 +256,6 @@ class _QurationItemPageState extends State<QurationItemPage> {
     $item.setOffset(0);
     print('나갈때 카디비____${$item.offset}');
     $item.resetItemList();
-    $qurate.resetQmodelList();
     $item.setFirstCatSelect({'code': '000', 'name': '전체'});
     $item.setSecCatSelect({'code': '000', 'name': '전체'});
     this._tempFirstCat = {'code': '000', 'name': '전체'};
@@ -244,11 +296,10 @@ class _QurationItemPageState extends State<QurationItemPage> {
  }
 
  Widget _qitemBody($qurate, $user, $item, img_url) {
-    return
-        CustomScrollView(
+    return CustomScrollView(
             controller: _qiscrollController,
             slivers: <Widget>[
-              $qurate.qitemId == '1'
+              $qurate.qcontId == '1'
                   ? SliverAppBar(
 //                pinned: true,
               snap:true,
@@ -277,7 +328,7 @@ class _QurationItemPageState extends State<QurationItemPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    $qurate.qitemId == '3'
+                    $qurate.qcontId == '3'
                         ? GestureDetector(
                       onTap: () {
                         _showCategory(
@@ -408,8 +459,73 @@ class _QurationItemPageState extends State<QurationItemPage> {
                     delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) {
                         return InkWell(
-                          onTap: () =>
-                              print('$img_url${$item.itemList[index].imgFile}'),
+                          onTap: () async{
+
+                            listToMap($item.qitemList[index]);
+                            final pref = await SharedPreferences.getInstance();
+                            var recentItemList =  pref.getStringList('recentItemList');
+                            print('리센트리스트 보러갑니다앙____$recentItemList');
+
+                            if(recentItemList == null) {
+                              print('list가 읍어요');
+                              pref.setStringList('recentItemList', []);
+                              var recentItemList =  pref.getStringList('recentItemList');
+                              recentItemList.insert(0, jsonEncode(newMap));
+                              pref.setStringList('recentItemList', recentItemList);
+
+                            } else {
+
+                              List<RItemList> _recent2 = [];
+                              List _timeList = [];
+
+                              for(var i = 0; i<recentItemList.length; i++) {
+                                print(jsonDecode(recentItemList[i]));
+                                _timeList.add(jsonDecode(recentItemList[i]));
+                              }
+                              print('timeList____$_timeList');
+
+                              _recent2 = _timeList.map<RItemList>((json) => RItemList.fromJson(json)).toList();
+                              print(_recent2);
+
+                              print('list가 있지요');
+                              bool _isIncluded = false;
+                              int _includeIndex = 0;
+                              for(int i = 0; i < recentItemList.length; i++) {
+                                if(_recent2[i].ritemId == $item.qitemList[index].qitemId) {
+                                  print(_recent2[i].ritemId);
+                                  print($item.qitemList[index].qitemId);
+                                  print('몇번째냐 $i');
+                                  _includeIndex = i;
+                                  _isIncluded = true;
+                                  break;
+                                }
+                              }
+
+                              if(!_isIncluded) {
+                                print('이건 안왔을거고...');
+                                if(recentItemList.length == 30) {
+                                  recentItemList.removeLast();
+                                }
+                                recentItemList.insert(0, jsonEncode(newMap));
+                              } else{
+                                print('이건데...');
+                                print(recentItemList);
+                                recentItemList.removeAt(_includeIndex);
+                                print(recentItemList);
+                                recentItemList.insert(0, jsonEncode(newMap));
+                              }
+
+                              print(recentItemList);
+
+                              pref.setStringList('recentItemList', recentItemList);
+                            }
+
+
+                            this._viewData[0] = $item.qitemList[index].qlinkUrl;
+                            this._viewData[1] = $item.qitemList[index].qitemId;
+                            this._viewData[2] = $item.qitemList[index].qisHeart == 't' ?  't':'f';
+                            _showWebview();
+                          },
                           child: Card(
                               semanticContainer: true,
                               clipBehavior: Clip.none,
@@ -422,13 +538,26 @@ class _QurationItemPageState extends State<QurationItemPage> {
                                     children: <Widget>[
                                       ClipRRect(
                                           borderRadius: BorderRadius.circular(10),
-                                          child: FadeInImage.memoryNetwork(
-                                              fit: BoxFit.cover,
+                                          child:CachedNetworkImage(
+                                            fadeInCurve: Curves.fastOutSlowIn,
+                                            fadeInDuration: Duration(seconds: 1),
+                                            fit: BoxFit.cover,
+                                            width:120,
+                                            height:160,
+                                            imageUrl: "$img_url${$item.qitemList[index].qimgFile}",
+                                            placeholder: (context, url) => Container(
                                               width: 120,
-                                              height: 160,
-                                              placeholder: kTransparentImage,
-                                              image: '$img_url${$item.itemList[index]
-                                                  .imgFile}')),
+                                              height:160,
+                                              color:Color(0XFFececec)
+                                            ),
+                                            errorWidget: (context, url, error) => Container(
+                                                width: 120,
+                                                height: 160,
+                                                child: Center(child: Icon(Icons.error))
+                                            ),
+                                          ),
+                                      ),
+                                      $item.qitemList[index].qisNew == 't' ?
                                       Positioned(
                                         top: 5,
                                         left: 5,
@@ -440,31 +569,18 @@ class _QurationItemPageState extends State<QurationItemPage> {
                                           child: Padding(
                                             padding: const EdgeInsets.fromLTRB(
                                                 6, 3, 6, 3),
-                                            child: Text(
-                                              'N',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
+                                            child: Text('N', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),)
                                           ),
                                         ),
-                                      ),
-                                      Positioned(
-                                          top: 3,
-                                          right: 4,
-                                          child: Icon(
-                                            Icons.favorite,
-                                            color: Colors.grey,
-                                            size: 25,
-                                          )),
+                                      ):
+                                      Container(),
                                     ],
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(top: 12),
                                   ),
                                   Text(
-                                    _fixPrice($item.itemList[index].price),
+                                    _fixPrice($item.qitemList[index].qprice),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                     style: TextStyle(
@@ -473,7 +589,7 @@ class _QurationItemPageState extends State<QurationItemPage> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    $item.itemList[index].name,
+                                    $item.qitemList[index].qname,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                     style: TextStyle(
@@ -485,17 +601,29 @@ class _QurationItemPageState extends State<QurationItemPage> {
                               )),
                         );
                       },
-                      childCount: $item.itemList.length,
+                      childCount: $item.qitemList.length,
                     ),
                   )),
               SliverToBoxAdapter(
-                child:
-                $item.listCnt == 0 ?
-                Center(child:Text(_noMoreItem, style: TextStyle(fontSize: 16))):
-                Container(
-                  height: 30,
-                  child: _isLoad == true ? Center(child: CircularProgressIndicator()): Container(),
-                )
+                child:Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    $item.listCnt == 0 ?
+                    Container(
+                        height: 80,
+                        child: Center(child:Text(_noMoreItem, style: TextStyle(fontSize: 16)))):
+                    Container(
+                      height: 80,
+                      child: _isLoad == true ? Center(child: Container(
+                          width: 80,
+                          height:80,
+                          child: CupertinoActivityIndicator(
+                            radius: 20,
+                          ))): Container(),
+                    )
+                  ],
+                ),
               ),
             ]
         );
@@ -538,7 +666,7 @@ class _QurationItemPageState extends State<QurationItemPage> {
                         ),
                         Container(
                           height: 70,
-                          child: $qurate.qitemId == '3'
+                          child: $qurate.qcontId == '3'
                               ? ListView.builder(
                               scrollDirection: Axis.horizontal,
                               shrinkWrap: true,
@@ -678,7 +806,7 @@ class _QurationItemPageState extends State<QurationItemPage> {
                                       $item.setPrice(this._tempPrice);
                                       $item.setOrder(this._tempOrder);
                                       $item.setOffset(0);
-                                      $item.getItemList($user.accessToken, $user.userHeight);
+                                      $item.getQItemList($user.accessToken, $user.userHeight, $qurate.qcontId, $user.appInfo);
                                       Scrollable.ensureVisible(fkey.currentContext);
                                       Navigator.pop(context);
                                     },
@@ -1012,4 +1140,28 @@ class _QurationItemPageState extends State<QurationItemPage> {
       this._tempPrice = i;
     });
   }
+
+  void _showWebview() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) {
+          return ShopViewPage(viewData: this._viewData);
+        }));
+  }
+
+  void listToMap(x) {
+    newMap['ritemId'] = x.qitemId;
+    newMap['risHeart'] = x.qisHeart;
+    newMap['rcat1'] = x.qcat1;
+    newMap['rcat2'] = x.qcat2;
+    newMap['risNew'] = x.qisNew;
+    newMap['rname'] = x.qname;
+    newMap['rprice'] = x.qprice;
+    newMap['rlinkUrl'] = x.qlinkUrl;
+    newMap['rimgFile'] = x.qimgFile;
+    newMap['rinfo'] = x.qinfo;
+    newMap['rshopId'] = x.qshopId;
+    newMap['rheight'] = x.qheight;
+    newMap['rmodelId'] = x.qmodelId;
+  }
+
 }

@@ -18,7 +18,7 @@ class UserState with ChangeNotifier {
   String _userPassword = '';
   String _snsType = '';
   String _snsId = '';
-  String _appType = '';
+  String _appInfo = '';
   List _deviceInfo = [];
   String _pushKey = '';
   String _options = '';
@@ -37,7 +37,7 @@ class UserState with ChangeNotifier {
     this._userPassword = '';
     this._snsType = '';
     this._snsId = '';
-    this._appType = '';
+    this._appInfo = '';
     this._deviceInfo = [];
     this._pushKey = '';
     this._options = '';
@@ -87,8 +87,8 @@ class UserState with ChangeNotifier {
     return _snsId;
   }
 
-  String get appType {
-    return _appType;
+  String get appInfo {
+    return _appInfo;
   }
 
   String get pushKey {
@@ -108,25 +108,25 @@ class UserState with ChangeNotifier {
 
   var dio = Dio();
 
-  signUp() async {
+  Future<bool> signUp() async {
     Response response;
     try{
-      response = await dio.post("$baseUrl/users/signup",
+      response = await dio.post("$baseUrl/users/100/signup",
           data: {
             "snsType": _snsType,
             "email": _userEmail,
             "passwd": _userPassword,
             "snsId": _snsId,
-            "appType": _appType,
             "pushKey": _pushKey,
-            "deviceInfo": '',
             "options": _options,
-          });
+          },
+          options: Options(headers: {"User-Agent": _appInfo}));
       if(response.data['status'] == 200) {
-        print('로그인리쥴트${response.data['result']}');
+        print('회원가입리쥴트${response.data['result']}');
         var st = jsonDecode(response.data['result']['userId']);
         this._userId = "$st";
         this._signUpMes = true;
+        this.setAccessToken(response.data['result']['authToken']);
       } else if (response.data['status'] == 511) {
         this._signStr = '다른 이메일을 사용해주세요';
         this._signUpMes = false;
@@ -135,6 +135,7 @@ class UserState with ChangeNotifier {
         this._signUpMes = false;
       }
       else {
+        this._signStr = '가입에 실패했습니다.';
         this._signUpMes = false;
       }
     }catch(e) {
@@ -142,9 +143,10 @@ class UserState with ChangeNotifier {
       print('cr error--------$e');
     }
     notifyListeners();
+    return this._signUpMes;
   }
 
-  userLogIn() async {
+  Future<bool> userLogIn() async {
     Dio dio = new Dio();
     Response response;
     var data = {
@@ -152,25 +154,23 @@ class UserState with ChangeNotifier {
       "email": _userEmail,
       "passwd": _userPassword,
       "snsId": _snsId,
-      "appType": _appType,
       "pushKey": _pushKey,
-      "deviceInfo": _deviceInfo,
       "options": _options,
     };
     print('accessToken1------$_accessToken');
     print('send data+ $data');
+    print(_appInfo);
     try{
-      response = await dio.post("$baseUrl/users/signin",
+      response = await dio.post("$baseUrl/users/100/signin",
           data: {
             "snsType": _snsType,
             "email": _userEmail,
             "passwd": _userPassword,
             "snsId": _snsId,
-            "appType": _appType,
             "pushKey": _pushKey,
-            "deviceInfo": '',
             "options": _options,
-          });
+          },
+          options: Options(headers: {"User-Agent": _appInfo}));
       print('first+${response.data}');
       if(response.data['status'] == 200) {
         print('ㅇㅋ데이터받아옴--------${response.data['result']}');
@@ -191,23 +191,74 @@ class UserState with ChangeNotifier {
         print('로그인 에러-------${response.data}');
         this._signUpMes = false;
       }
-    }catch(e) {
+    } catch(e) {
       this._signUpMes = false;
       print('login error--------$e');
     }
     notifyListeners();
+    return this._signUpMes;
   }
 
   userTemppw(i) async{
     Response response;
     try{
-      response = await dio.put("$baseUrl/users/temppw",
+      response = await dio.put("$baseUrl/users/100/temppw",
           data: {
             "email": i,
             "passwd": '',
             "passwd2": '',
-          });
+          },
+          options: Options(headers: {"User-Agent": _appInfo}));
       print(i);
+      if(response.statusCode == 200) {
+        print(response.data['result']);
+      }else {
+        print(response.data['result']);
+      }
+    }catch(e) {
+      print(e);
+    }
+    notifyListeners();
+  }
+
+  changePw(i ,j) async{
+    Response response;
+    try{
+      response = await dio.put("$baseUrl/users/100/pw",
+          data: {
+            "email": '',
+            "passwd": i,
+            "passwd2": j,
+          },
+          options: Options(headers: {"Authorization": _accessToken,"User-Agent": _appInfo}));
+      print(i);
+      if(response.statusCode == 200) {
+        print(response.data['result']);
+        this._signStr = '비밀번호가 변경되었습니다.';
+        this._signUpMes = true;
+      }else if (response.data['status'] == 500) {
+        this._signStr = '비밀번호 변경에 실패했습니다.';
+        this._signUpMes = false;
+      }else if (response.data['status'] == 404) {
+        this._signStr = '해당되는 사용자 정보가 없습니다.';
+        this._signUpMes = false;
+      }else if (response.data['status'] == 503) {
+        this._signStr = '현재 비밀번호가 틀렸습니다.';
+        this._signUpMes = false;
+      }else {
+        print(response.data['result']);
+      }
+    }catch(e) {
+      print(e);
+    }
+    notifyListeners();
+  }
+
+  changeNoti(i) async{
+    Response response;
+    try{
+      response = await dio.put("$baseUrl/users/100/push/$i",
+          options: Options(headers: {"Authorization": _accessToken,"User-Agent": _appInfo}));
       if(response.statusCode == 200) {
         print(response.data['result']);
       }else {
@@ -221,7 +272,7 @@ class UserState with ChangeNotifier {
 
   userLogOut() async {
     Dio dio = new Dio();
-    await dio.delete("$baseUrl/users");
+    await dio.delete("$baseUrl/users/100");
     notifyListeners();
   }
 
@@ -242,24 +293,27 @@ class UserState with ChangeNotifier {
 
   setAutoLogin() async {
     Dio dio = new Dio();
-    await dio.post("$baseUrl/users/signre/$_appType/push",
+    await dio.post("$baseUrl/users/100/signre/$options",
         options: Options(
             headers: {
-              "Authorization" : _accessToken,
+              "Authorization" : _accessToken,"User-Agent": _appInfo
             }));
-    this._options = 'push';
     notifyListeners();
   }
 
   setUserHeight(i) async {
     Dio dio = new Dio();
     print('accessTokenForHeight------'+_accessToken);
-    await dio.put("$baseUrl/users/height/$i",
-        options: Options(
-          headers: {
-            "Authorization" : _accessToken,
-          }));
-    this._userHeight = i;
+    try{
+      await dio.put("$baseUrl/users/100/height/$i",
+          options: Options(
+              headers: {
+                "Authorization" : _accessToken,"User-Agent": _appInfo
+              }));
+      this._userHeight = i;
+    } catch(e) {
+      print('이거임?');
+    }
     notifyListeners();
   }
 
@@ -283,8 +337,8 @@ class UserState with ChangeNotifier {
     notifyListeners();
   }
 
-  setUserAppType(i) {
-    this._appType = i;
+  setUserAppInfo(i) {
+    this._appInfo = i;
     notifyListeners();
   }
 

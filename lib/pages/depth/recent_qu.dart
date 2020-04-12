@@ -1,17 +1,15 @@
 import 'dart:convert';
-import 'package:fitchoo/pages/depth/mark_qu.dart';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fitchoo/pages/depth/quration_id.dart';
-import 'package:fitchoo/pages/depth/recentItem.dart';
-import 'package:fitchoo/pages/depth/recent_qu.dart';
-import 'package:fitchoo/pages/depth/save_item.dart';
 import 'package:fitchoo/states/item_state.dart';
 import 'package:fitchoo/states/qurate_state.dart';
 import 'package:fitchoo/states/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 class QrecentList {
   String rqcontId = '';
@@ -50,15 +48,17 @@ class QrecentList {
   }
 }
 
-class StorePage extends StatefulWidget {
+class RecentQuPage extends StatefulWidget {
+  final List recentList;
+  RecentQuPage({Key key, this.recentList}) : super(key: key);
   @override
-  _StorePageState createState() => _StorePageState();
+  _RecentQuPageState createState() => _RecentQuPageState();
 }
 
-class _StorePageState extends State<StorePage> {
-  Map<String, String> newMap = {};
+class _RecentQuPageState extends State<RecentQuPage> {
   List<QrecentList> _recent2;
   List _timeList = [];
+  Map<String, String> newMap = {};
 
   @override
   void initState() {
@@ -67,6 +67,7 @@ class _StorePageState extends State<StorePage> {
     _openbox();
     super.initState();
   }
+
 
   @override
   void dispose() {
@@ -82,6 +83,8 @@ class _StorePageState extends State<StorePage> {
       _timeList.add(jsonDecode(les[i]));
     }
     print('timeList____$_timeList');
+
+//    _recent2 = _timeList.map<QrecentList>((json) => QrecentList.fromJson(json)).toList();
     setState(() {
       _recent2 = _timeList.map<QrecentList>((json) => QrecentList.fromJson(json)).toList();
     });
@@ -98,87 +101,41 @@ class _StorePageState extends State<StorePage> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        leading: new IconButton(
+          icon: new Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          }
+        ),
+        title: Text('최근 본 큐레이션', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
         centerTitle: true,
-        title: Text('보관함', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+        elevation: 1,
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _recent2.length == 0 ?
-          Container():
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              ListTile(
-                trailing: Icon(Icons.keyboard_arrow_right),
-                title: Text('최근 본 큐레이션'),
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) {
-                        return RecentQuPage(recentList: this._recent2);
-                      }));
-                },
-              ),Container(
-                margin: EdgeInsets.symmetric(vertical: 5),
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  itemCount: _recent2.length == 10 ? 10 : _recent2.length,
-                  itemExtent: 220,
-                  itemBuilder: (context, index) {
-                    return _buildRecentCards($qurate, img_url, index, $user, $item);
-                  },
-                ),
-              ),
-            ],
-          ),
-          ListTile(
-            leading: Icon(Icons.bookmark),
-            trailing: Icon(Icons.keyboard_arrow_right),
-            title: Text('즐겨찾기한 큐레이션'),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) {
-                    return MarkQurationPage();
-                  }));
+      body: SingleChildScrollView(
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 14.w),
+            physics: ClampingScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: _recent2.length == 10 ? 10 : _recent2.length,
+            itemBuilder: (context, index) {
+              return _buildRecentCards($qurate, img_url, index, $user, $item);
             },
-          ),
-          ListTile(
-            leading: Icon(Icons.favorite),
-            trailing: Icon(Icons.keyboard_arrow_right),
-            title: Text('찜한 상품'),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) {
-                    return SaveItemPage();
-                  }));
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.remove_red_eye),
-            trailing: Icon(Icons.keyboard_arrow_right),
-            title: Text('최근 본 상품'),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) {
-                    return RecentItemPage();
-                  }));
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
 
-
-  Widget _buildRecentCards($qurate, img_url, int index, $user, $item) {
-    return InkWell(
-          splashColor: Colors.white,
+  Widget _buildRecentCards($qurate, img_url, index, $user, $item) {
+    return Padding(
+      padding: EdgeInsets.only(bottom:5.h),
+      child: Card(
+        semanticContainer: true,
+        clipBehavior: Clip.none,
+        elevation: 0,
+        child : InkWell(
           onTap: () async{
+
             $qurate.switchHero('r');
 
             listToMap($qurate, _recent2[index]);
@@ -225,6 +182,7 @@ class _StorePageState extends State<StorePage> {
 
               pref.setStringList('recentList', recentQList);
             }
+
             print($qurate.qitemList[index].iqcontId);
 
             await $qurate.getQurateInfo($user.accessToken, _recent2[index].rqcontId, $user.appInfo);
@@ -232,34 +190,108 @@ class _StorePageState extends State<StorePage> {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => QurationIdPage()));
           },
-          child: Container(
-            margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
-            child: Card(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: FadeInImage.memoryNetwork(
-                          fit: BoxFit.cover,
-                          width: 170,
-                          height: 130,
-                          placeholder: kTransparentImage,
-                          image:
-                          '$img_url${_recent2[index].rimgLinkTitle}')),
-                  Padding(
-                    padding: EdgeInsets.only(top: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(right: 10.w),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child:CachedNetworkImage(
+                    fadeInCurve: Curves.fastOutSlowIn,
+                    fadeInDuration: Duration(seconds: 1),
+                    fit: BoxFit.cover,
+                    width:160.w,
+                    height:110.h,
+                    imageUrl: "$img_url${_recent2[index].rimgLinkTitle}",
+                    placeholder: (context, url) => Container(
+                        width:160.w,
+                        height:110.h,
+                        color:Color(0XFFececec)
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                        width:160.w,
+                        height:110.h,
+                        child: Center(child: Icon(Icons.error))
+                    ),
                   ),
-                  Text(
-                    '${_recent2[index].rtitle}',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
+                ),
               ),
-              elevation: 0,
-            ),
+              Container(
+                width: 160.w,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(bottom:6.h),
+                      child: Text(
+                        _recent2[index].rtitle,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style:TextStyle(color: Color(0XFF000000), fontSize: ScreenUtil().setSp(13))
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Text(_recent2[index].rquserName, style:TextStyle(color: Color(0XFF8a8a8a), fontSize: ScreenUtil().setSp(12))),
+                        Text(' ${String.fromCharCode(0x2022)} ', style:TextStyle(color: Color(0XFF8a8a8a), fontSize: ScreenUtil().setSp(12))),
+                        Text('조회수 ${_modiCnt(_recent2[index].rclickCnt)}', style:TextStyle(color: Color(0XFF8a8a8a), fontSize: ScreenUtil().setSp(12))),
+                      ],
+                    ),
+                    Text('상품 업데이트 ${timeModi(_recent2[index].ritemupDate)}', style:TextStyle(color: Color(0XFF8a8a8a), fontSize: ScreenUtil().setSp(12))),
+                  ],
+                ),
+              )
+
+            ],
           ),
-      );
+        )
+      ),
+    );
+  }
+
+  _modiCnt(i) {
+    int _index = 0;
+    if (i.length == 6) {
+      _index = 3;
+      i = i.substring(0, 6);
+    } else if (i.length == 5) {
+      _index = 2;
+      i = i.substring(0, 5);
+    } else if (i.length == 4) {
+      _index = 1;
+      i = i.substring(0, 4);
+    } else {
+      return i;
+    }
+    return i.substring(0, _index) + "," + i.substring(_index);
+  }
+
+
+  String timeModi(t) {
+    var test = Jiffy(t).fromNow();
+    if(test.contains('day')) {
+      if(test.contains('days')) {
+        return '${test.substring(0,2)}일전';
+      } else {
+        return '1 일전';
+      }
+    } else if(test.contains('hour')) {
+      if(test.contains('hours')) {
+        return '${test.substring(0,2)}시간전';
+      } else {
+        return '1 시간전';
+      }
+    } else if(test.contains('minute')) {
+      if(test.contains('minutes')) {
+        return '${test.substring(0,2)}분전';
+      } else {
+        return '1 분전';
+      }
+    }
+    return test;
   }
 
   void listToMap($qurate, x) {

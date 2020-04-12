@@ -50,6 +50,156 @@ class ItemList {
   }
 }
 
+class QItemList {
+  String qitemId = '';
+  String qisHeart = '';
+  String qcat1 = '';
+  String qcat2 = '';
+  String qisNew = '';
+  String qname = '';
+  String qprice = '';
+  String qlinkUrl = '';
+  String qimgFile = '';
+  String qinfo = '';
+  String qshopId = '';
+  String qheight = '';
+  String qmodelId = '';
+
+  QItemList({
+    this.qitemId,
+    this.qisHeart,
+    this.qcat1,
+    this.qcat2,
+    this.qisNew,
+    this.qname,
+    this.qprice,
+    this.qlinkUrl,
+    this.qimgFile,
+    this.qinfo,
+    this.qshopId,
+    this.qheight,
+    this.qmodelId
+  });
+
+  factory QItemList.fromJson(Map<String, dynamic> json) {
+    return QItemList(
+      qitemId: json["itemId"],
+      qisHeart: json["isHeart"],
+      qcat1: json["cat1"],
+      qcat2: json["cat2"],
+      qisNew: json["isNew"],
+      qname: json["name"],
+      qprice: json["price"],
+      qlinkUrl: json["linkUrl"],
+      qimgFile: json["imgFile"],
+      qinfo: json["info"],
+      qshopId: json["shopId"],
+      qheight: json["height"],
+      qmodelId: json["modelId"],
+    );
+  }
+}
+
+class KItemList {
+  String kitemId = '';
+  String kisHeart = '';
+  String kcat1 = '';
+  String kcat2 = '';
+  String kisNew = '';
+  String kname = '';
+  String kprice = '';
+  String klinkUrl = '';
+  String kimgFile = '';
+  String kinfo = '';
+  String kshopId = '';
+  String kheight = '';
+  String kmodelId = '';
+
+  KItemList({
+    this.kitemId,
+    this.kisHeart,
+    this.kcat1,
+    this.kcat2,
+    this.kisNew,
+    this.kname,
+    this.kprice,
+    this.klinkUrl,
+    this.kimgFile,
+    this.kinfo,
+    this.kshopId,
+    this.kheight,
+    this.kmodelId
+  });
+
+  factory KItemList.fromJson(Map<String, dynamic> json) {
+    return KItemList(
+      kitemId: json["itemId"],
+      kisHeart: json["isHeart"],
+      kcat1: json["cat1"],
+      kcat2: json["cat2"],
+      kisNew: json["isNew"],
+      kname: json["name"],
+      kprice: json["price"],
+      klinkUrl: json["linkUrl"],
+      kimgFile: json["imgFile"],
+      kinfo: json["info"],
+      kshopId: json["shopId"],
+      kheight: json["height"],
+      kmodelId: json["modelId"],
+    );
+  }
+}
+
+class SaveItemList {
+  String sitemId = '';
+  String sisHeart = '';
+  String scat1 = '';
+  String scat2 = '';
+  String sisNew = '';
+  String sname = '';
+  String sprice = '';
+  String slinkUrl = '';
+  String simgFile = '';
+  String sinfo = '';
+  String sshopId = '';
+  String sheight = '';
+  String smodelId = '';
+
+  SaveItemList({
+    this.sitemId,
+    this.sisHeart,
+    this.scat1,
+    this.scat2,
+    this.sisNew,
+    this.sname,
+    this.sprice,
+    this.slinkUrl,
+    this.simgFile,
+    this.sinfo,
+    this.sshopId,
+    this.sheight,
+    this.smodelId
+  });
+
+  factory SaveItemList.fromJson(Map<String, dynamic> json) {
+    return SaveItemList(
+      sitemId: json["itemId"],
+      sisHeart: json["isHeart"],
+      scat1: json["cat1"],
+      scat2: json["cat2"],
+      sisNew: json["isNew"],
+      sname: json["name"],
+      sprice: json["price"],
+      slinkUrl: json["linkUrl"],
+      simgFile: json["imgFile"],
+      sinfo: json["info"],
+      sshopId: json["shopId"],
+      sheight: json["height"],
+      smodelId: json["modelId"],
+    );
+  }
+}
+
 class ItemState with ChangeNotifier {
 //  -----------------------------------
 //  State
@@ -67,6 +217,9 @@ class ItemState with ChangeNotifier {
   Map<String, String> _pr = {'priceRange': '0r4000000', 'name': '전체'};
   Map<String, String> _order = {'sortOrder': 'de', 'name': '정렬'};
   List<ItemList> _itemList = [];
+  List<QItemList> _qitemList = [];
+  List<KItemList> _kitemList = [];
+  List<SaveItemList> _sitemList = [];
   List<Map<String, String>> _secCatList = [];
 
 //  -----------------------------------
@@ -87,6 +240,9 @@ class ItemState with ChangeNotifier {
     this._pr = {'priceRange': '0r4000000', 'name': '전체'};
     this._order = {'sortOrder': 'de', 'name': '정렬'};
     this._itemList = [];
+    this._qitemList = [];
+    this._kitemList = [];
+    this._sitemList = [];
     this._secCatList = [];
   }
 
@@ -149,6 +305,18 @@ class ItemState with ChangeNotifier {
     return _itemList;
   }
 
+  List<QItemList> get qitemList {
+    return _qitemList;
+  }
+
+  List<KItemList> get kitemList {
+    return _kitemList;
+  }
+
+  List<SaveItemList> get sitemList {
+    return _sitemList;
+  }
+
   List<Map<String, String>> get secCatList {
     return _secCatList;
   }
@@ -158,42 +326,136 @@ class ItemState with ChangeNotifier {
 
   var dio = Dio();
 
-  Future<List<ItemList>> getItemList(i, height) async {
-    List<ItemList> list;
+  Future<List<QItemList>> getQItemList(i, height, qcontId, j) async {
+    List<QItemList> qitemlist;
     Response response;
     try {
-      response = await dio.get("$baseUrl/items/32/all",
+      response = await dio.get("$baseUrl/items/100/qcont/0$qcontId",
           queryParameters: {
             "offset": _offset,
             "limit": 30,
             'height': height,
             'cat1': _cat1['code'],
             'cat2': _cat2['code'],
-            'qid': _qid,
             'fit1': _fit1,
-            'option': _option,
-            'keyword': _keyword,
             'hr': _hr,
             'pr': _pr['priceRange'],
             'order': _order['sortOrder']
           },
-          options: Options(headers: {"Authorization": i}));
+          options: Options(headers: {"Authorization": i, "User-Agent": j}));
       if (response.statusCode == 200) {
         this._totCnt = jsonDecode(response.data['result']['totCnt']);
         this._listCnt = jsonDecode(response.data['result']['listCnt']);
         var les = response.data['result']['itemList'];
-        list = les.map<ItemList>((json) => ItemList.fromJson(json)).toList();
-        print('상품리스트_____$list');
+        qitemlist = les.map<QItemList>((json) => QItemList.fromJson(json)).toList();
+        print('상품리스트_____$qitemlist');
         print('카디비_____${this._offset}');
         if (this._offset == 0) {
-          this._itemList = list;
+          this._qitemList = qitemlist;
         } else {
-          this._itemList.addAll(list);
+          this._qitemList.addAll(qitemlist);
         }
       }
     } catch (e) {
       print(e);
     }
+    notifyListeners();
+  }
+
+  Future<List<KItemList>> getKItemList(i, height, keyword, j) async {
+    List<KItemList> kitemlist;
+    Response response;
+    try {
+      response = await dio.get("$baseUrl/items/100/name/$keyword",
+          queryParameters: {
+            "offset": _offset,
+            "limit": 30,
+            'pr': _pr['priceRange'],
+            'order': _order['sortOrder']
+          },
+          options: Options(headers: {"Authorization": i, "User-Agent": j}));
+      if (response.statusCode == 200) {
+        this._totCnt = jsonDecode(response.data['result']['totCnt']);
+        this._listCnt = jsonDecode(response.data['result']['listCnt']);
+        var les = response.data['result']['itemList'];
+        kitemlist = les.map<KItemList>((json) => KItemList.fromJson(json)).toList();
+        print('상품리스트_____$kitemlist');
+        print('카디비_____${this._offset}');
+        if (this._offset == 0) {
+          this._kitemList = kitemlist;
+        } else {
+          this._kitemList.addAll(kitemlist);
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+    notifyListeners();
+  }
+
+
+  addSavedProduct(i,j,k) async{
+    Response response;
+    try{
+      response = await dio.post("$baseUrl/items/100/heart/$j",
+          options: Options(
+              headers: {"Authorization": i, "User-Agent": k}));
+      print('굿');
+    } catch(e) {
+      print('낫 굿');
+    }
+    notifyListeners();
+  }
+
+  removeSavedProduct(i,j,k) async{
+    Response response;
+    try{
+      response = await dio.delete("$baseUrl/items/100/heart/$j",
+          options: Options(
+              headers: {"Authorization": i, "User-Agent": k}));
+      print('굿');
+    } catch(e) {
+      print('낫 굿');
+    }
+    notifyListeners();
+  }
+
+
+  Future<List<SaveItemList>> getSaveList(i, j) async {
+    List<SaveItemList> list;
+    Response response;
+    try {
+      response = await dio.get("$baseUrl/items/100/heart",
+          queryParameters: {"offset": _offset, "limit": 30},
+          options: Options(headers: {"Authorization": i, "User-Agent": j}));
+      if (response.statusCode == 200) {
+        print("ㅇㅋ 받아옴 -------${response.data['result']}");
+
+        this._totCnt = jsonDecode(response.data['result']['totCnt']);
+        this._listCnt = jsonDecode(response.data['result']['listCnt']);
+
+        var les = response.data['result']['itemList'];
+        print('큐레이션리스트____$les');
+        list = les.map<SaveItemList>((json) => SaveItemList.fromJson(json)).toList();
+        if (_offset == 0) {
+          this._sitemList = list;
+        } else {
+          this._sitemList.addAll(list);
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+    notifyListeners();
+  }
+
+  sendItemInfo(i,j,k) async {
+    Response response;
+    try {
+      response = await dio.get("$baseUrl/items/100/info/$j",
+          options: Options(
+              headers: {"Authorization": i, "User-Agent": k}));
+    } catch (e) {}
     notifyListeners();
   }
 
@@ -203,12 +465,18 @@ class ItemState with ChangeNotifier {
   }
 
   setQid(i) async {
+    print('qid 세팅합니다아-----$_qid');
     this._qid = i;
     notifyListeners();
   }
 
   resetItemList() async {
     this._itemList.clear();
+    notifyListeners();
+  }
+
+  resetQItemList() async {
+    this._qitemList.clear();
     notifyListeners();
   }
 

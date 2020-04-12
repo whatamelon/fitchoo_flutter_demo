@@ -71,10 +71,9 @@ class _QurationIdPageState extends State<QurationIdPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
-                                Hero(tag: _switchHero($qurate),
-                                    child: Stack(
+                                Stack(
                                       children: <Widget>[
-                                        Image.network('$img_url${$qurate.imgItemFile}', fit: BoxFit.fitWidth,),
+                                        Image.network('$img_url${$qurate.imgLinkTitle}', fit: BoxFit.fitWidth,),
                                         Positioned(top: 10, left: 10,
                                           child: ClipOval(
                                             child: Container(width: 35, height:35,
@@ -89,7 +88,7 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                           ),
                                         )
                                       ],
-                                    )),
+                                    ),
                               ],
                             )),
                       ),
@@ -119,7 +118,7 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                         children: <Widget>[
                                           Text(' 조회수 ${_modiCnt($qurate.clickCnt)} ', style: TextStyle(color:Color(0XFF777777), fontSize: 14),),
                                           Text(' ${String.fromCharCode(0x2022)} '),
-                                          Text(' 상품수 234개', style: TextStyle(color:Color(0XFF777777), fontSize: 14),),
+                                          Text(' 상품수 ${_modiCnt($qurate.itemCnt)}개', style: TextStyle(color:Color(0XFF777777), fontSize: 14),),
                                           Text(' ${String.fromCharCode(0x2022)} '),
                                           Text('상품 업데이트 ${timeModi($qurate.itemupDate)}', style: TextStyle(color:Color(0XFF777777), fontSize: 14),),
                                         ],
@@ -130,58 +129,49 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       IconButton(
-                                          icon: Icon(Icons.bookmark,color: Colors.red,),
+                                          icon: $qurate.isMark == 't'?
+                                          Icon(Icons.bookmark,color: Colors.red,) :
+                                          Icon(Icons.bookmark_border,color: Colors.red,),
                                           onPressed: () {
-
+                                            setState(() {
+                                              if($qurate.isMark == 't') {
+                                                $qurate.removemarkQurate($user.accessToken, $qurate.qcontId, $user.appInfo);
+                                              } else {
+                                                $qurate.addmarkQurate($user.accessToken, $qurate.qcontId, $user.appInfo);
+                                              }
+                                            });
                                           }),
-                                      Text('203', style: TextStyle(color:Colors.red, fontSize: 15,),),
-                                      IconButton(
-                                          icon: Icon(Icons.chat_bubble,color: Colors.grey,),
-                                          onPressed: () {
-
-                                          }),
-                                      Text('12', style: TextStyle(color:Colors.grey, fontSize: 15,),),
+                                      Text($qurate.markCnt, style: TextStyle(color:Colors.red, fontSize: 15,),),
+//                                      IconButton(
+//                                          icon: Icon(Icons.chat_bubble,color: Colors.grey,),
+//                                          onPressed: () {
+//
+//                                          }),
+//                                      Text($qurate.markCnt, style: TextStyle(color:Colors.grey, fontSize: 15,),),
                                     ],
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.only(top:5),
-                                    child: Container(
-                                      width:size.width*0.9,
-                                      child: Wrap(
-                                        direction: Axis.horizontal,
-                                        alignment: WrapAlignment.start,
-                                        verticalDirection: VerticalDirection.down,
-                                        spacing: 10,
-                                        runSpacing: 2,
-                                        children: <Widget>[
-                                          Chip(
-                                            padding: EdgeInsets.fromLTRB(5, 8, 5, 8),
-                                            backgroundColor: Colors.grey,
-                                            label: Text('#쇼핑몰모음', style: TextStyle(fontSize: 15),),
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(20))),
-                                          ),
-                                          Chip(
-                                            padding: EdgeInsets.fromLTRB(5, 8, 5, 8),
-                                            backgroundColor: Colors.grey,
-                                            label: Text('#키작녀', style: TextStyle(fontSize: 15),),
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(20))),
-                                          ),
-                                          Chip(
-                                            padding: EdgeInsets.fromLTRB(5, 8, 5, 8),
-                                            backgroundColor: Colors.grey,
-                                            label: Text('#20대', style: TextStyle(fontSize: 15),),
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(20))),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                   Container(
+                                     height:50,
+                                     child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      shrinkWrap: true,
+                                      itemCount: $qurate.tagList.length,
+//                                      itemExtent: 60,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return Container(
+                                          margin: EdgeInsets.symmetric(horizontal: 2),
+                                          child: Chip(
+                                              padding: EdgeInsets.fromLTRB(5, 8, 5, 8),
+                                              backgroundColor: Colors.grey,
+                                              label: Text($qurate.tagList[index], style: TextStyle(fontSize: 15),),
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(20))),
+                                            ),
+                                        );
+                                      }
                                   ),
+                                   ),
                                 ],
                               ),
                             ),
@@ -195,7 +185,7 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                   padding: EdgeInsets.only(right: 15,left: size.width*0.03),
                                   child: ClipOval(
                                     child: Image.network(
-                                      '$img_url${$qurate.imgFaceFile}',
+                                      '$img_url${$qurate.quserImgLink}',
                                       width: 45,
                                       height: 45,
                                       fit: BoxFit.cover,
@@ -206,8 +196,8 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text('민송', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),),
-                                    Text('큐레이터', style: TextStyle(fontSize: 16, color: Colors.grey),),
+                                    Text($qurate.quserName, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),),
+                                    Text($qurate.quserDepartment, style: TextStyle(fontSize: 16, color: Colors.grey),),
                                   ],
                                 )
 
@@ -228,9 +218,14 @@ class _QurationIdPageState extends State<QurationIdPage> {
                                     child: Text($qurate.body, style: TextStyle(fontSize: 18, color: Colors.grey),),
                                   ),
                                   Text('이런 분께 추천해요', style: TextStyle(fontSize: 20),),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 8.0, bottom: 8),
-                                    child: Text($qurate.body, style: TextStyle(fontSize: 18, color: Colors.grey),),
+                                  ListView.builder(
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      itemCount: $qurate.recommendList.length,
+//                                      itemExtent: 60,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return Text($qurate.recommendList[index], style: TextStyle(fontSize: 15),);
+                                      }
                                   ),
                                 ],
                               ),
@@ -248,7 +243,7 @@ class _QurationIdPageState extends State<QurationIdPage> {
                     backgroundColor: Color(0XFFec3e39),
                     splashColor: Colors.red,
                     icon: Icon(Icons.save),
-                    label: Text('상품보러가기', style: TextStyle(fontSize: 20),),
+                    label: Text('${_modiCnt($qurate.itemCnt)}개 상품 보기', style: TextStyle(fontSize: 20),),
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (BuildContext context) => QurationItemPage()));
@@ -261,18 +256,6 @@ class _QurationIdPageState extends State<QurationIdPage> {
         );
       },
     );
-  }
-
-  _switchHero($qurate) {
-    if ($qurate.qSwitchHero == 'i') {
-      return 'i${$qurate.imgItemFile}';
-    } else if ($qurate.qSwitchHero == 'p') {
-      return 'p${$qurate.imgItemFile}';
-    } else if ($qurate.qSwitchHero == 'n') {
-      return 'n${$qurate.imgItemFile}';
-    } else {
-      return 'r${$qurate.imgItemFile}';
-    }
   }
 
   _modiCnt(i) {
@@ -293,6 +276,7 @@ class _QurationIdPageState extends State<QurationIdPage> {
   }
 
   String timeModi(t) {
+    print(t);
     var test = Jiffy(t).fromNow();
     if(test.contains('day')) {
       if(test.contains('days')) {
@@ -312,6 +296,8 @@ class _QurationIdPageState extends State<QurationIdPage> {
       } else {
         return '1 분전';
       }
+    } else {
+      return test;
     }
     return test;
   }

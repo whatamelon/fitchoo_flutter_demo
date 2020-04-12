@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:fitchoo/pages/base/home.dart';
+import 'dart:io';
+import 'dart:math';
 import 'package:fitchoo/pages/init.dart';
 import 'package:fitchoo/pages/tab.dart';
 import 'package:fitchoo/states/qurate_state.dart';
@@ -9,9 +10,10 @@ import 'package:airplane_mode_detection/airplane_mode_detection.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:device_info/device_info.dart';
+import 'package:package_info/package_info.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -19,12 +21,25 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  List _deviceInfo = <dynamic>[];
+  static final DeviceInfoPlugin plugin = DeviceInfoPlugin();
+  bool _fadeIn = false;
   bool _autoLogin = false;
+  String _appInfo = '';
+
   @override
   void initState() {
     super.initState();
-    loadData();
+    initPlatform(_deviceInfo);
     detectAir();
+
+    Timer(Duration(seconds: 1), () async{
+      loadData();
+      setState(() {
+        _fadeIn = true;
+      });
+    });
+
   }
 
   @override
@@ -35,53 +50,62 @@ class _SplashPageState extends State<SplashPage> {
             gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [const Color(0xFFeb3349), const Color(0xFFf45c43)])),
+            colors: [const Color(0xFFf45c43), const Color(0xFFeb3349)])),
       child: new Center(
-        child: Image.asset('assets/white_logo.png', width: 200,),
+        child: AnimatedOpacity(
+            duration: Duration(seconds: 2),
+            curve: Curves.easeIn,
+            opacity: _fadeIn ? 1.0 : 0.0,
+            child: Image.asset('assets/white_logo.png', width: 200,)
+        ),
       ),
       ),
     );
   }
 
   Future<Timer> loadData() async {
-    await Hive.initFlutter();
+    final pref = await SharedPreferences.getInstance();
+    var loginInfo =  pref.getStringList('userLoginInfo');
     UserState $user = Provider.of<UserState>(context, listen: false);
-    var box = await Hive.openBox('userInfo');
-    if(box != null) {
-      String aToken = box.get('accessToken');
-      if(aToken == '' || aToken == null) {
-      }else {
-        String snsType = box.get('snsType');
-        String userEmail = box.get('userEmail');
-        String password = box.get('password');
-        String snsId = box.get('snsId');
-        String appType = box.get('appType');
-        $user.setUserSNSType(snsType);
-        $user.setUserAppType(appType);
-        $user.setUserSNSId(snsId);
-        $user.setUserEmail(userEmail);
-        $user.setUserPassword(password);
-        $user.userLogIn();
-        box.put('accessToken', $user.accessToken);
-        var box2 = Hive.box('userInfo');
-        print('userInfo in Hive: $box2');
-        await box.close();
+    print('이건?');
+    if(loginInfo == null) {
+      print('로그인안됨');
+      return Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => InitPage()));
+    } else {
+      print(loginInfo);
+        if(loginInfo.length < 6) {
+          return Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => InitPage()));
+        }
+      String snsType = loginInfo[0];
+      String userEmail = loginInfo[1];
+      String password = loginInfo[2];
+      String snsId = loginInfo[3];
+      String userHeight = loginInfo[5];
+      $user.setUserSNSType(snsType);
+      $user.setUserSNSId(snsId);
+      $user.setUserEmail(userEmail);
+      $user.setUserPassword(password);
+      $user.setUserHeight(userHeight);
+      bool loginState = await $user.userLogIn();
 
+      if(loginState) {
+        print('로그인됐거');
         setState(() {
           _autoLogin = true;
         });
+      } else {
+        print('로그인안됨');
+        return Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => InitPage()));
       }
-    } else {
-
     }
     return new Timer(Duration(seconds: 2), onDoneLoading);
   }
 
   onDoneLoading() async {
     if(_autoLogin) {
-      UserState $user = Provider.of<UserState>(context, listen: false);
-      QurateState $qurate = Provider.of<QurateState>(context, listen: false);
-      $qurate.getQurateList($user.accessToken);
+//      UserState $user = Provider.of<UserState>(context, listen: false);
+//      QurateState $qurate = Provider.of<QurateState>(context, listen: false);
+//      $qurate.getQurateList($user.accessToken, $user.appInfo);
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => TabPage()));
     } else{
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => InitPage()));
@@ -127,4 +151,57 @@ class _SplashPageState extends State<SplashPage> {
       new Timer(Duration(seconds: 2), pop);
     }
   }
+
+  Future<void> initPlatform(_deviceInfo) async {
+    print('info1');
+    if (Platform.isAndroid) {
+        PackageInfo packageInfo = await PackageInfo.fromPlatform();
+        String andversionName = packageInfo.version;
+
+        _deviceInfo = getAndroidDevice(await plugin.androidInfo);
+        this._appInfo = 'Android/$andversionName (${_deviceInfo[0]}; SDK/${_deviceInfo[1]})';
+
+    }
+    if (Platform.isIOS) {
+        PackageInfo packageInfo = await PackageInfo.fromPlatform();
+        String iosversionName = packageInfo.version;
+
+        _deviceInfo = getIosDevice(await plugin.iosInfo);
+        this._appInfo = 'IOS/$iosversionName (${_deviceInfo[0]}; SDK/${_deviceInfo[1]})';
+    }
+
+    print('info2');
+    final pref = await SharedPreferences.getInstance();
+    var appInfo =  pref.getString('appInfo');
+    if(appInfo == null) {
+      pref.setString('appInfo', '');
+      appInfo = this._appInfo;
+      pref.setString('appInfo', appInfo);
+    } else {
+      appInfo = this._appInfo;
+      pref.setString('appInfo', appInfo);
+    }
+    print(appInfo);
+    print(this._appInfo);
+    print('info3');
+
+    UserState $user = Provider.of<UserState>(context, listen: false);
+    $user.setUserAppInfo(this._appInfo);
+
+    print('info4');
+  }
+}
+
+getIosDevice(IosDeviceInfo data) {
+  return [
+    data.name,
+    data.systemVersion,
+  ];
+}
+
+getAndroidDevice(AndroidDeviceInfo device) {
+  return [
+    device.model,
+    device.version.sdkInt
+  ];
 }

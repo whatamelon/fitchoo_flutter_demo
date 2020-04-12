@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fitchoo/pages/shopView.dart';
 import 'package:fitchoo/states/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:fitchoo/states/item_state.dart';
 import 'package:flutter_conditional_rendering/conditional_switch.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +17,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  List<String> _viewData = ['','','','','',''];
 
   final skey = new GlobalKey();
   final ScrollController _searchScrollController = new ScrollController();
@@ -84,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
             });
           });
           $item.setOffset($item.offset + 10);
-          $item.getItemList($user.accessToken, $user.userHeight);
+          $item.getKItemList($user.accessToken, $user.userHeight, _searchController.text, $user.appInfo);
         }
       } else {
         print('ㅇㅋ3__$_isLoad');
@@ -96,6 +100,7 @@ class _SearchPageState extends State<SearchPage> {
   Future _openbox() async{
     final prefs = await SharedPreferences.getInstance();
     this._recentLists = prefs.getStringList('searchList');
+    print(this._recentLists);
     return this._recentLists;
   }
 
@@ -117,82 +122,104 @@ class _SearchPageState extends State<SearchPage> {
     final String img_url = "https://s3.ap-northeast-2.amazonaws.com/image.fitchoo";
     UserState $user = Provider.of<UserState>(context, listen: false);
     ItemState $item = Provider.of<ItemState>(context, listen: false);
+    ScreenUtil.init(context, width: 360, height: 640, allowFontScaling: true);
 
-    return Scaffold(
-      appBar: _searchAppBar($item, $user, size),
-      body:
-      _isFirst == '0'?
-        _searchSuggest() :
-      _isFirst == '1'?
-        _recentList($item, $user):
-        _searchBody($item, img_url, $user),
+    return WillPopScope(
+//      onWillPop: _onBackPressed,
+      child: Scaffold(
+        appBar: _searchAppBar($item, $user, size),
+        body:
+        _isFirst == '0'?
+          _searchSuggest() :
+        _isFirst == '1'?
+          _recentList($item, $user):
+          _searchBody($item, img_url, $user),
+      ),
     );
   }
 
  Widget _searchAppBar($item, $user, size) {
     return PreferredSize(
-      preferredSize: _isFirst == '0' && _isFocus != true ? Size.fromHeight(120): Size.fromHeight(70),
+      preferredSize: _isFirst == '0' && _isFocus != true ? Size.fromHeight(140): Size.fromHeight(70),
       child: AppBar(
           automaticallyImplyLeading: false,
           elevation: 0,
           flexibleSpace: Padding(
-            padding: EdgeInsets.fromLTRB(5, 40, 5, 0),
+            padding: _isFirst == '0' && _isFocus != true ? EdgeInsets.only(top:20.h) : EdgeInsets.all(0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(bottom:5),
+                  padding: _isFirst == '0' && _isFocus != true ? EdgeInsets.only(bottom:13.h) : EdgeInsets.all(0),
                   child: AnimatedContainer(
                     height: _isFirst == '0' && _isFocus != true ? 30 : 0,
                     alignment: Alignment.center,
-                    duration: Duration(milliseconds: 30),
+                    duration: Duration(milliseconds: 500),
                     curve: Curves.fastOutSlowIn,
                     child: Text('검색', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    AnimatedContainer(
-                      width: _isFirst == '0' && _isFocus != true ? size.width : size.width-60,
-                      height: 50,
-                      duration: Duration(milliseconds: 30),
-                      curve: Curves.fastOutSlowIn,
-                      child: TextField(
-                          textInputAction: TextInputAction.search,
-                          onSubmitted: (value) {
-                            _searchGo(value, $item, $user);
-                          },
-                          focusNode: _searchFocusNode,
-                          autofocus: false,
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.search, color: Colors.black,),
-                              hintText: "검색 내용을 입력해주세요.",
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(20.0)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.blueAccent),
-                                  borderRadius: BorderRadius.circular(20.0)))
+                _isFirst == '0' && _isFocus != true ? Expanded(child: Divider(thickness: 1, color: Colors.black,)): Container(),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(14.w,15.h, 14.w ,0.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      AnimatedContainer(
+                        width: _isFirst == '0' && _isFocus != true ? size.width : size.width-70.w,
+                        height: 50,
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.fastOutSlowIn,
+                        child: TextField(
+                              textInputAction: TextInputAction.search,
+                              onSubmitted: (value) {
+                                _searchGo(value, $item, $user);
+                              },
+                              focusNode: _searchFocusNode,
+                              autofocus: false,
+                              controller: _searchController,
+                              decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.search, color: Color(0XFF8a8a8a),),
+                                  hintText: "검색하고 싶은 상품명을 입력하세요.",
+                                  hintStyle: TextStyle(
+                                    color:Color(0XFF8a8a8a),
+                                    fontSize: ScreenUtil().setSp(14)
+                                  ),
+                                  filled: true,
+                                  fillColor: Color(0XFFececec),
+                                  hoverColor: Color(0XFFececec),
+                                  focusColor: Color(0XFFececec),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Color(0XFFececec)),
+                                      borderRadius: BorderRadius.circular(70.0)),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Color(0XFFececec)),
+                                      borderRadius: BorderRadius.circular(70.0)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Color(0XFFececec)),
+                                      borderRadius: BorderRadius.circular(70.0)))
+                          ),
                       ),
-                    ),
-                    Visibility(
-                      visible: _isFirst != '0',
-                      child: GestureDetector(
-                          onTap: () {
-                            FocusScope.of(context).unfocus();
-                            _searchController.clear();
-                            setState(() {
-                              this._isFocus = false;
-                              this._isFirst = '0';
-                            });
-                          },
-                        child: Text('취소' ,style: TextStyle(fontWeight: FontWeight.bold),)
-                      ),
-                    )
-                  ],
+                      Visibility(
+                        visible: _isFirst != '0',
+                        child: GestureDetector(
+                            onTap: () {
+                              FocusScope.of(context).unfocus();
+                              _searchController.clear();
+                              setState(() {
+                                this._isFocus = false;
+                                this._isFirst = '0';
+                              });
+                            },
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 13.w),
+                            child: Text('취소' ,style: TextStyle(fontWeight: FontWeight.w500, fontSize: ScreenUtil().setSp(14)),),
+                          )
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ],
             )
@@ -204,9 +231,7 @@ class _SearchPageState extends State<SearchPage> {
  Widget _searchBody($item, img_url, $user) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          return WillPopScope(
-              onWillPop: _onBackPressed,
-              child: CustomScrollView(
+          return CustomScrollView(
                 controller: _searchScrollController,
                 slivers: <Widget>[
                   SliverAppBar(
@@ -280,7 +305,15 @@ class _SearchPageState extends State<SearchPage> {
                       delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                           return InkWell(
-                            onTap: () => print('$img_url${$item.itemList[index].imgFile}'),
+                            onTap: () {
+                              this._viewData[0] = $item.itemList[index].linkUrl;
+                              this._viewData[1] = 'yes';
+                              this._viewData[2] = 'yes';
+                              this._viewData[3] = 'yes';
+                              this._viewData[4] = 'yes';
+                              this._viewData[5] = 'yes';
+                              _showWebview();
+                            },
                             child: Card(
                                 semanticContainer: true,
                                 clipBehavior: Clip.none,
@@ -293,12 +326,24 @@ class _SearchPageState extends State<SearchPage> {
                                       children: <Widget>[
                                         ClipRRect(
                                             borderRadius: BorderRadius.circular(10),
-                                            child: FadeInImage.memoryNetwork(
-                                                fit: BoxFit.cover,
-                                                width: 120,
-                                                height: 160,
-                                                placeholder: kTransparentImage,
-                                                image:'$img_url${$item.itemList[index].imgFile}')),
+                                            child: CachedNetworkImage(
+                                              fadeInCurve: Curves.fastOutSlowIn,
+                                              fadeInDuration: Duration(seconds: 1),
+                                              fit: BoxFit.cover,
+                                              width:120,
+                                              height:160,
+                                              imageUrl: "$img_url${$item.kitemList[index].kimgFile}",
+                                              placeholder: (context, url) => Container(
+                                                  width: 120,
+                                                  height:160,
+                                                  color:Color(0XFFececec)
+                                              ),
+                                              errorWidget: (context, url, error) => Container(
+                                                  width: 120,
+                                                  height: 160,
+                                                  child: Center(child: Icon(Icons.error))
+                                              ),
+                                            ),),
                                         Positioned(
                                           top: 5,
                                           left: 5,
@@ -334,7 +379,7 @@ class _SearchPageState extends State<SearchPage> {
                                       padding: EdgeInsets.only(top: 12),
                                     ),
                                     Text(
-                                      _fixPrice($item.itemList[index].price),
+                                      _fixPrice($item.kitemList[index].kprice),
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       style: TextStyle(
@@ -343,7 +388,7 @@ class _SearchPageState extends State<SearchPage> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      $item.itemList[index].name,
+                                      $item.kitemList[index].kname,
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       style: TextStyle(
@@ -355,7 +400,7 @@ class _SearchPageState extends State<SearchPage> {
                                 )),
                           );
                         },
-                        childCount: $item.itemList.length,
+                        childCount: $item.kitemList.length,
                       ),
                     ),
                   ),
@@ -366,11 +411,10 @@ class _SearchPageState extends State<SearchPage> {
                       Container(
                         height: 30,
                         width:30,
-                        child: _isLoad == true ? Center(child: CircularProgressIndicator()): Container(),
+                        child: this._isLoad == true ? Center(child: CircularProgressIndicator()): Container(),
                       )
                   ),
                 ],
-              )
           );
         }
     );
@@ -505,7 +549,7 @@ class _SearchPageState extends State<SearchPage> {
                                       $item.setPrice(this._tempPrice);
                                       $item.setOrder(this._tempOrder);
                                       $item.setOffset(0);
-                                      $item.getItemList($user.accessToken, $user.userHeight);
+                                      $item.getKItemList($user.accessToken, $user.userHeight, _searchController.text, $user.appInfo);
                                       Scrollable.ensureVisible(skey.currentContext);
                                       Navigator.pop(context);
                                     },
@@ -528,9 +572,9 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _buildSort($item) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: GridView.builder(
-//                    physics: ClampingScrollPhysics(),
+          physics: ClampingScrollPhysics(),
           shrinkWrap: true,
           itemCount: _orderList.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -668,28 +712,34 @@ class _SearchPageState extends State<SearchPage> {
   }
 
  Widget _searchSuggest() {
-    return WillPopScope(
-      onWillPop: _onBackPressed,
-      child: Text('홀로롤로롤롤로로로')
-    );
+    return Container();
  }
 
   Widget _recentList($item, $user) {
-    return WillPopScope(
-        onWillPop: _onBackPressed,
-        child: ListView.builder(
+    return
+      _recentLists == null ?
+          Container()
+          :ListView.builder(
           itemCount: _recentLists.length,
             itemBuilder: (BuildContext context, int i) {
-              return ListTile(
-                leading: Icon(Icons.search),
-                trailing: Text('삭제'),
-                title: Text(_recentLists[i]),
-                onTap: () {
-                  _searchGo(_recentLists[i], $item, $user);
-                },
+              return Padding(
+                padding: EdgeInsets.fromLTRB(12.w, 0, 7.w, 0),
+                child: ListTile(
+                  leading: Padding(
+                    padding: EdgeInsets.only(right: 31.w),
+                    child: Icon(Icons.search, size: 25.w,),
+                  ),
+                  trailing: InkWell(
+                    onTap: ()  => _removeSearch(i),
+                    child: Text('삭제')
+                  ),
+                  title: Text(_recentLists[i], style: TextStyle(fontSize: ScreenUtil().setSp(14)),),
+                  onTap: () {
+                    _searchGo(_recentLists[i], $item, $user);
+                  },
+                ),
               );
             }
-        )
     );
   }
 
@@ -719,8 +769,8 @@ class _SearchPageState extends State<SearchPage> {
       print(value);
       $item.setSearch(value);
       $item.setOffset(0);
-      $item.getItemList($user.accessToken, $user.userHeight);
-      Timer(Duration(milliseconds: 30), () async{
+      $item.getKItemList($user.accessToken, $user.userHeight, _searchController.text, $user.appInfo);
+      Timer(Duration(seconds: 1), () async{
         setState(() {
           this._isFirst = '2';
           this._isFocus = false;
@@ -741,16 +791,29 @@ class _SearchPageState extends State<SearchPage> {
     $item.setOffset(0);
     print('나갈때 카디비____${$item.offset}');
     $item.resetItemList();
-    $item.setFirstCatSelect({'code': '000', 'name': '전체'});
-    $item.setSecCatSelect({'code': '000', 'name': '전체'});
     $item.setFit({'fit1': "", 'name': "체형"});
     $item.setPrice({'priceRange': '0r4000000', 'name': '가격'});
     $item.setOrder({'sortOrder': 'de', 'name': '정렬'});
-//    this._tempFirstCat = {'code': '000', 'name': '전체'};
-//    this._tempSecCat = {'code': '000', 'name': '전체'};
-//    this._tempOrder = {'sortOrder': 'de', 'name': '정렬'};
-//    this._tempPrice = {'priceRange': '0r4000000', 'name': '전체'};
-//    this._tempFit = {'fit1': "", 'name': "전체"};
+    this._tempOrder = {'sortOrder': 'de', 'name': '정렬'};
+    this._tempPrice = {'priceRange': '0r4000000', 'name': '전체'};
     Navigator.pop(context);
   }
+
+  void _removeSearch(i) async{
+   final pref = await SharedPreferences.getInstance();
+   var sList2 =  pref.getStringList('searchList');
+   sList2.removeAt(i);
+   setState(() {
+     this._recentLists = sList2;
+   });
+   pref.setStringList('searchList', sList2);
+ }
+
+  void _showWebview() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) {
+          return ShopViewPage(viewData: this._viewData);
+        }));
+  }
+
 }
